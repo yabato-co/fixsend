@@ -206,13 +206,27 @@ Deno.serve(async (req) => {
   const expectedProductPermalink = Deno.env.get("GUMROAD_PRODUCT_PERMALINK") || "fixsend-fix-pack";
   const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-  const form = await req.formData();
-  const saleId = String(form.get("sale_id") || form.get("id") || "");
-  const email = String(form.get("email") || "");
-  const permalink = String(form.get("permalink") || form.get("product_permalink") || "");
-  const urlParamsRaw = String(form.get("url_params") || "");
-  const allFields = Object.fromEntries(form.entries());
-  let sessionId = String(form.get("session_id") || "");
+  const contentType = req.headers.get("content-type") || "";
+  const allFields: Record<string, FormDataEntryValue | string> = {};
+
+  if (contentType.includes("multipart/form-data") || contentType.includes("application/x-www-form-urlencoded")) {
+    const form = await req.formData();
+    Object.assign(allFields, Object.fromEntries(form.entries()));
+  } else {
+    const rawBody = await req.text();
+    try {
+      Object.assign(allFields, JSON.parse(rawBody));
+    } catch {
+      const params = new URLSearchParams(rawBody);
+      Object.assign(allFields, Object.fromEntries(params.entries()));
+    }
+  }
+
+  const saleId = String(allFields.sale_id || allFields.id || "");
+  const email = String(allFields.email || "");
+  const permalink = String(allFields.permalink || allFields.product_permalink || "");
+  const urlParamsRaw = String(allFields.url_params || "");
+  let sessionId = String(allFields.session_id || "");
 
   if (permalink && permalink !== expectedProductPermalink) {
     return Response.json({ ok: false, error: "Wrong product" }, { status: 400 });
