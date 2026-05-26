@@ -210,6 +210,28 @@ h3 {
   border: 1px solid rgba(36, 68, 229, 0.18);
 }
 
+a.button.gumroad-button {
+  color: var(--white) !important;
+  background: var(--primary) !important;
+  background-image: none !important;
+  border: 0 !important;
+  text-indent: 0 !important;
+  text-shadow: none !important;
+  box-shadow: 0 14px 28px rgba(36, 68, 229, 0.24) !important;
+}
+
+a.button.secondary.gumroad-button {
+  color: var(--primary) !important;
+  background: var(--white) !important;
+  border: 1px solid rgba(36, 68, 229, 0.18) !important;
+  box-shadow: none !important;
+}
+
+a.button.gumroad-button::before,
+a.button.gumroad-button::after {
+  display: none !important;
+}
+
 .privacy-note {
   color: var(--muted);
   font-size: 14px;
