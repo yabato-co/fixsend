@@ -186,6 +186,17 @@ const formMessage = document.querySelector("#formMessage");
 const loadingState = document.querySelector("#loadingState");
 const results = document.querySelector("#results");
 
+const roleLabels = {
+  "ux-designer": "UX Designer",
+  "ui-designer": "UI Designer",
+  "product-designer": "Product Designer",
+  "web-designer": "Web Designer",
+  "graphic-designer": "Graphic Designer",
+  "frontend-developer": "Frontend Developer",
+  "junior-designer": "Junior Designer",
+  "career-switcher": "Career Switcher",
+};
+
 if (window.pdfjsLib) {
   window.pdfjsLib.GlobalWorkerOptions.workerSrc =
     "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
@@ -356,11 +367,15 @@ function renderResults(data) {
   document.querySelector("#keywordMatch").textContent = `${data.keywordMatchPercentage}%`;
   document.querySelector("#roleFit").textContent = data.roleFitLevel;
 
-  renderList("#missingKeywords", data.missingKeywords, "No major missing keywords found.");
-  renderList("#strengths", data.strengths, "No strengths detected yet.");
-  renderList("#weaknesses", data.weaknesses, "No major weaknesses detected.");
-  renderList("#quickFixes", data.quickFixes, "No quick fixes needed.");
-  renderList("#beforeChecklist", data.checklist, "Review your CV once more before applying.");
+  renderList(
+    "#freeFeedback",
+    [
+      data.weaknesses[0] || "Your CV needs clearer role positioning.",
+      data.quickFixes[0] || "Tighten your strongest bullets before applying.",
+      "Unlock Fix Pack to see the full diagnosis, missing keywords, rewrites, and checklist.",
+    ],
+    "Unlock Fix Pack to see the full improvement dashboard."
+  );
 }
 
 function setFileHelp(message, isError = false) {
@@ -482,6 +497,16 @@ form.addEventListener("submit", (event) => {
 
   window.setTimeout(() => {
     const data = analyze(cvText.value, targetRole.value);
+    localStorage.setItem(
+      "fixsendLastAnalysis",
+      JSON.stringify({
+        cvText: cvText.value,
+        targetRole: targetRole.value,
+        targetRoleLabel: roleLabels[targetRole.value] || "Product Designer",
+        freeResult: data,
+        createdAt: new Date().toISOString(),
+      })
+    );
     renderResults(data);
     loadingState.hidden = true;
     results.hidden = false;

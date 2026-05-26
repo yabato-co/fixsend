@@ -6,6 +6,7 @@ const dashboardClient = window.supabase.createClient(
 const params = new URLSearchParams(window.location.search);
 const reportId = params.get("id");
 const isDemo = params.get("demo") === "true";
+const isPaid = params.get("paid") === "true";
 const page = document.querySelector(".dashboard-page");
 
 function listItems(items) {
@@ -109,6 +110,45 @@ function renderDashboard(data) {
 }
 
 async function loadDashboard() {
+  if (isPaid) {
+    const saved = JSON.parse(localStorage.getItem("fixsendLastAnalysis") || "null");
+
+    if (!saved || !saved.cvText) {
+      page.innerHTML = `
+        <header class="dashboard-topbar">
+          <a class="dashboard-brand" href="index.html">
+            <span>FS</span>
+            <strong>FixSend Fix Pack</strong>
+          </a>
+          <p>Private dashboard</p>
+        </header>
+        <section class="dashboard-hero">
+          <div>
+            <p class="eyebrow">Missing CV data</p>
+            <h1>Run the free CV analysis first.</h1>
+            <p>
+              This paid dashboard is generated from the CV you analyzed on FixSend.
+              Go back, upload your CV, run the analysis, then open Fix Pack again.
+            </p>
+            <a class="dashboard-button" href="index.html#try-it">Analyze CV</a>
+          </div>
+        </section>
+      `;
+      return;
+    }
+
+    renderDashboard(
+      createFixPack({
+        fullName: "FixSend customer",
+        email: "",
+        targetRole: saved.targetRole,
+        targetRoleLabel: saved.targetRoleLabel,
+        cvText: saved.cvText,
+      })
+    );
+    return;
+  }
+
   if (isDemo) {
     renderDashboard({
       fullName: "Demo Customer",

@@ -69,13 +69,17 @@ Fix Pack is positioned as a private dashboard.
 Automated MVP flow:
 
 1. Customer buys Fix Pack on Gumroad.
-2. Gumroad receipt/content should send the customer to `submit.html`.
-3. Customer submits purchase email, target role, FixSend score, and CV text.
-4. `submit.js` creates a rule-based Fix Pack dashboard.
-5. The dashboard data is stored in Supabase.
-6. Customer is redirected to `dashboard.html?id=<report-id>`.
+2. Gumroad redirects the customer to `dashboard.html?paid=true`.
+3. The dashboard reads the CV analysis stored in the customer's browser.
+4. `fixpack-engine.js` generates the detailed Fix Pack dashboard automatically.
 
-Email delivery is the next step. Add Resend or another email service after the dashboard flow works.
+This version does not require a second form. It is browser-based and works best when the customer purchases from the same browser after running the free analysis.
+
+For Gumroad, set the post-purchase redirect/content link to:
+
+`https://yabato-co.github.io/fixsend/dashboard.html?paid=true`
+
+Email delivery and payment verification require a backend/webhook and can be added later.
 
 ## Supabase SQL
 
@@ -83,7 +87,7 @@ The full table and policy setup is in:
 
 `supabase.sql`
 
-For the browser-only dashboard MVP, the public anon key needs insert permission on `fixpack_reports`. This is what lets `submit.html` create the dashboard row.
+The current paid dashboard flow no longer requires `submit.html`. Supabase files remain in the repo for the later backend/webhook version.
 
 ## Where payment or AI can be added later
 

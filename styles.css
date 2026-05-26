@@ -539,6 +539,7 @@ h3 {
 .metric-card,
 .insight-grid article,
 .checklist,
+.free-feedback,
 .result-offer {
   padding: 20px;
   background: var(--soft);
@@ -574,7 +575,8 @@ li {
   line-height: 1.5;
 }
 
-.checklist {
+.checklist,
+.free-feedback {
   margin-top: 18px;
 }
 
