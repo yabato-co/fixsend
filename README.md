@@ -60,7 +60,7 @@ In `index.html`, find the comment near the **Get Fix Pack - $9** button:
 <!-- Gumroad overlay checkout. After purchase, Gumroad receipt sends customers to https://tally.so/r/44p06b. -->
 ```
 
-The site loads Gumroad's overlay script and uses `gumroad-button` links with `data-gumroad-single-product="true"` so direct checkout can open on top of the FixSend page. If the script does not load, the same link still opens the Gumroad checkout page.
+The site loads Gumroad's overlay script and keeps the checkout links styled with local CSS. If Gumroad's overlay object is available, checkout opens on top of the FixSend page. If the script does not load, the same link still opens the Gumroad checkout page.
 
 ## Where payment or AI can be added later
 

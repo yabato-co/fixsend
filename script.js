@@ -488,3 +488,12 @@ form.addEventListener("submit", (event) => {
     results.scrollIntoView({ behavior: "smooth", block: "start" });
   }, 1500);
 });
+
+document.querySelectorAll(".checkout-button").forEach((button) => {
+  button.addEventListener("click", (event) => {
+    if (window.GumroadOverlay) {
+      event.preventDefault();
+      window.GumroadOverlay.open(button.href);
+    }
+  });
+});
