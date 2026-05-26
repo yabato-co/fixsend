@@ -66,20 +66,15 @@ The site loads Gumroad's overlay script and keeps the checkout links styled with
 
 Fix Pack is positioned as a private dashboard.
 
-Automated MVP flow:
+Planned automated paid flow:
 
 1. Customer buys Fix Pack on Gumroad.
-2. Gumroad redirects the customer to `dashboard.html?paid=true`.
-3. The dashboard reads the CV analysis stored in the customer's browser.
-4. `fixpack-engine.js` generates the detailed Fix Pack dashboard automatically.
+2. Gumroad sends a webhook to Supabase Edge Function.
+3. The function verifies the sale and creates a report row.
+4. The customer opens `dashboard.html?id=<report-id>`.
+5. Dashboard loads only the paid report by id.
 
-This version does not require a second form. It is browser-based and works best when the customer purchases from the same browser after running the free analysis.
-
-For Gumroad, set the post-purchase redirect/content link to:
-
-`https://yabato-co.github.io/fixsend/dashboard.html?paid=true`
-
-Email delivery and payment verification require a backend/webhook and can be added later.
+Do not use `dashboard.html?paid=true` for production. Payment verification requires Gumroad webhook or license verification.
 
 ## Supabase SQL
 
