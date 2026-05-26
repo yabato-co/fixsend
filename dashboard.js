@@ -11,6 +11,28 @@ function listItems(items) {
   return items.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
 }
 
+function scoreBars(items) {
+  return (items || [])
+    .map(
+      (item) => `
+        <article class="score-card">
+          <div class="score-card-top">
+            <div>
+              <h3>${escapeHtml(item.label)}</h3>
+              <p>${escapeHtml(item.note)}</p>
+            </div>
+            <strong>${escapeHtml(item.score)}%</strong>
+          </div>
+          <div class="score-track" aria-hidden="true">
+            <span style="width: ${Number(item.score) || 0}%"></span>
+          </div>
+          <small>${escapeHtml(item.status)}</small>
+        </article>
+      `
+    )
+    .join("");
+}
+
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -22,6 +44,9 @@ function escapeHtml(value) {
 
 function renderDashboard(data) {
   const decisionClass = data.decision.toLowerCase();
+  const categoryScores = data.categoryScores || [];
+  const riskFlags = data.riskFlags || [];
+  const recruiterReadout = data.recruiterReadout || [];
   page.innerHTML = `
     <header class="dashboard-topbar">
       <a class="dashboard-brand" href="index.html">
@@ -57,6 +82,24 @@ function renderDashboard(data) {
       </aside>
     </section>
 
+    <section class="dashboard-panel overview-panel">
+      <div>
+        <p class="eyebrow">Dashboard includes</p>
+        <h2>What your Fix Pack covers</h2>
+        <p>
+          This report scores the signals recruiters look for in a UX/product design CV:
+          portfolio visibility, UX process, measurable impact, role language, and scan clarity.
+        </p>
+      </div>
+      <ul class="pill-list">
+        ${listItems(data.dashboardSections || ["CV diagnosis", "Priority fixes", "Rewrite guidance", "Missing keywords"])}
+      </ul>
+    </section>
+
+    <section class="score-section">
+      ${scoreBars(categoryScores)}
+    </section>
+
     <section class="dashboard-grid">
       <article class="dashboard-card">
         <h2>Priority Fixes</h2>
@@ -64,7 +107,17 @@ function renderDashboard(data) {
       </article>
 
       <article class="dashboard-card">
-        <h2>Profile Summary</h2>
+        <h2>Recruiter Scan</h2>
+        <ul>${listItems(recruiterReadout)}</ul>
+      </article>
+
+      <article class="dashboard-card warning-card">
+        <h2>Risk Flags</h2>
+        <ul>${listItems(riskFlags.length ? riskFlags : ["No critical risk flags found. Keep polishing the strongest evidence."])}</ul>
+      </article>
+
+      <article class="dashboard-card">
+        <h2>Profile Summary Direction</h2>
         <p>${escapeHtml(data.profileSummary)}</p>
       </article>
 

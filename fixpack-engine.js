@@ -110,6 +110,17 @@ function fixPackStructure(cleanedCv, rawCv) {
   };
 }
 
+function scoreLabel(score) {
+  if (score >= 8) return "Strong";
+  if (score >= 6) return "Workable";
+  if (score >= 4) return "Needs work";
+  return "Weak";
+}
+
+function percentScore(score) {
+  return Math.round(fixPackClamp(score) * 10);
+}
+
 function createFixPack(input) {
   const cvText = input.cvText || "";
   const role = input.targetRole || "product-designer";
@@ -128,6 +139,60 @@ function createFixPack(input) {
   const overall = fixPackClamp(roleFitScore * 0.34 + structureScore * 0.26 + designScore * 0.22 + impactScore * 0.18);
   const decision = overall >= 8 && structure.portfolio ? "Send" : overall < 5.5 ? "Skip" : "Fix";
   const roleFit = roleFitScore >= 7 ? "Strong" : roleFitScore >= 4.5 ? "Medium" : "Low";
+  const portfolioScore = role === "frontend-developer"
+    ? fixPackClamp((structure.projects ? 5 : 1) + (structure.metrics ? 3 : 0) + (structure.tools ? 2 : 0))
+    : fixPackClamp((structure.portfolio ? 5 : 0) + (structure.projects ? 2 : 0) + (structure.tools ? 2 : 0) + (structure.metrics ? 1 : 0));
+  const processScore = fixPackClamp(
+    fixPackCount(data.cleaned, ["research", "wireframe", "prototype", "testing", "handoff", "documentation", "user flow"]) * 1.4
+  );
+  const atsScore = fixPackClamp(readiness / 10);
+  const scanScore = fixPackClamp((structure.contact ? 2 : 0) + (structure.skills ? 2 : 0) + (structure.experience ? 2 : 0) + (structure.education ? 1 : 0) + (structure.projects ? 2 : 0) + (structure.portfolio ? 1 : 0));
+  const evidenceScore = fixPackClamp((structure.metrics ? 4 : 0) + impactScore * 0.6);
+  const categoryScores = [
+    {
+      label: "Portfolio Signal",
+      score: percentScore(portfolioScore),
+      status: scoreLabel(portfolioScore),
+      note: structure.portfolio
+        ? "Portfolio signal is visible. Make sure it opens and supports the target role."
+        : "Portfolio signal is missing or too hard to find.",
+    },
+    {
+      label: "UX Process",
+      score: percentScore(processScore),
+      status: scoreLabel(processScore),
+      note: "Looks for research, flows, wireframes, prototypes, testing, handoff, and documentation.",
+    },
+    {
+      label: "Impact Evidence",
+      score: percentScore(evidenceScore),
+      status: scoreLabel(evidenceScore),
+      note: structure.metrics
+        ? "Some measurable proof is present."
+        : "Add metrics, scope, before/after outcomes, or concrete project results.",
+    },
+    {
+      label: "Role Keywords",
+      score: readiness,
+      status: scoreLabel(atsScore),
+      note: missing.length
+        ? `Missing high-signal terms include ${missing.slice(0, 3).join(", ")}.`
+        : "Role keyword coverage looks strong.",
+    },
+    {
+      label: "Recruiter Scan",
+      score: percentScore(scanScore),
+      status: scoreLabel(scanScore),
+      note: "Checks whether the CV is easy to scan through contact, skills, experience, projects, and education.",
+    },
+  ];
+  const riskFlags = [
+    !structure.portfolio && role !== "frontend-developer" ? "Portfolio link is not clearly visible." : "",
+    !structure.metrics ? "Impact is hard to prove because numbers or outcomes are missing." : "",
+    processScore < 5 ? "UX process is not explicit enough." : "",
+    roleFitScore < 5 ? "Target role language is weak." : "",
+    !structure.skills ? "Skills/tools section is not clearly signposted." : "",
+  ].filter(Boolean);
 
   const priorityFixes = [];
   if (!structure.portfolio && role !== "frontend-developer") priorityFixes.push("Add a portfolio link near your contact details.");
@@ -162,6 +227,8 @@ function createFixPack(input) {
         : decision === "Skip"
           ? "Your CV is missing too many core signals for this role. Build stronger proof before applying to similar positions."
           : "Your CV has potential, but it needs targeted fixes before applying. Focus on role keywords, measurable proof, and clearer positioning.",
+    categoryScores,
+    riskFlags,
     priorityFixes: priorityFixes.slice(0, 6),
     profileSummary,
     bulletTemplates,
@@ -177,6 +244,22 @@ function createFixPack(input) {
       "Add measurable outcomes where possible.",
       "Use truthful role-specific keywords naturally.",
       "Confirm links, portfolio, and contact details work.",
+    ],
+    recruiterReadout: [
+      `First impression: ${decision === "Send" ? "credible and close to application-ready" : decision === "Fix" ? "promising but not yet sharp enough" : "not aligned enough for this role"}.`,
+      `Portfolio signal: ${structure.portfolio ? "visible" : "missing or unclear"}.`,
+      `Evidence quality: ${structure.metrics ? "some outcomes are present" : "needs measurable outcomes"}.`,
+      `Role language: ${roleFit}.`,
+    ],
+    dashboardSections: [
+      "CV diagnosis",
+      "Priority fixes",
+      "Category scorecards",
+      "Recruiter scan",
+      "Profile summary direction",
+      "Bullet rewrite templates",
+      "Missing keywords",
+      "Before-applying checklist",
     ],
     nextStep:
       decision === "Send"
