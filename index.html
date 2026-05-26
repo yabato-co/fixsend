@@ -38,8 +38,8 @@
           <p class="eyebrow">Pre-apply decision engine</p>
           <h1>Know if you should send, fix, or skip before applying.</h1>
           <p class="hero-copy">
-            Paste your CV and a job description. FixSend gives you an instant decision,
-            match score, missing keywords, and quick fixes. No signup required.
+            Upload your CV and get an instant Send, Fix, or Skip signal. Add a job
+            description only if you want a sharper match score. No signup required.
           </p>
           <div class="hero-actions">
             <a class="button primary" href="#try-it">Check for free</a>
@@ -69,13 +69,13 @@
         <div class="steps">
           <article>
             <span>1</span>
-            <h3>Paste your CV</h3>
-            <p>Add your CV text exactly as you would send it.</p>
+            <h3>Upload your CV</h3>
+            <p>Add your PDF, DOCX, or TXT resume in one step.</p>
           </article>
           <article>
             <span>2</span>
-            <h3>Paste the job description</h3>
-            <p>FixSend compares your CV against the role's language.</p>
+            <h3>Choose your target role</h3>
+            <p>FixSend checks your CV against role-specific expectations.</p>
           </article>
           <article>
             <span>3</span>
@@ -90,34 +90,38 @@
           <p class="eyebrow">Try FixSend</p>
           <h2>Check your application fit.</h2>
           <p>
-            Your CV text is analyzed locally in your browser. We do not store your CV.
+            Your CV is analyzed locally in your browser. We do not store your CV.
           </p>
         </div>
 
         <form class="tool-grid" id="analysisForm" novalidate>
           <label class="field cv-field">
             <span>Your CV / resume</span>
-            <input
-              id="cvFile"
-              type="file"
-              accept=".txt,.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
-            />
-            <small class="field-help" id="cvFileHelp">
-              Upload a PDF, DOCX, or TXT CV. The text is read locally in your browser.
-            </small>
+            <div class="upload-box">
+              <input
+                id="cvFile"
+                type="file"
+                accept=".txt,.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
+              />
+              <label for="cvFile">
+                <strong>Upload CV</strong>
+                <small>PDF, DOCX, or TXT. Read locally in your browser.</small>
+              </label>
+            </div>
+            <small class="field-help" id="cvFileHelp">No file selected yet.</small>
             <textarea
               id="cvText"
               rows="12"
-              placeholder="Or paste the written content of your CV here. For example: contact, experience, education, skills, projects..."
+              placeholder="CV preview appears here after upload. You can also paste your CV text manually."
             ></textarea>
           </label>
 
           <label class="field jd-field">
-            <span>Job description</span>
+            <span>Job description <em>optional</em></span>
             <textarea
               id="jobText"
               rows="12"
-              placeholder="Paste the job description here..."
+              placeholder="Optional: paste a job description for a sharper application match. You can leave this empty."
             ></textarea>
           </label>
 

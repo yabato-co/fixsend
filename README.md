@@ -2,7 +2,7 @@
 
 FixSend by Yabato Co. is a zero-cost static web MVP for job seekers. It helps people decide whether they should **Send**, **Fix**, or **Skip** before applying to a role.
 
-The first version is optimized for designers and creative job seekers. Users upload or paste their CV, paste a job description, select a target role, and get a browser-only rule-based analysis.
+The first version is optimized for designers and creative job seekers. Users upload or paste their CV, select a target role, and get a browser-only rule-based analysis. A job description can be added later for a sharper application-specific score, but it is optional.
 
 ## How to open locally
 

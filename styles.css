@@ -361,7 +361,7 @@ h3 {
 .field textarea {
   min-height: 260px;
   padding: 16px;
-  resize: vertical;
+  resize: none;
 }
 
 .field input,
@@ -371,9 +371,51 @@ h3 {
 }
 
 .field input[type="file"] {
-  height: auto;
-  padding: 14px;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.upload-box label {
+  display: grid;
+  min-height: 116px;
+  place-items: center;
+  gap: 8px;
+  padding: 22px;
+  text-align: center;
   cursor: pointer;
+  background: linear-gradient(180deg, #ffffff 0%, #f6f8ff 100%);
+  border: 2px dashed rgba(36, 68, 229, 0.35);
+  border-radius: 18px;
+}
+
+.upload-box label:hover {
+  border-color: var(--primary);
+  box-shadow: 0 12px 28px rgba(36, 68, 229, 0.12);
+}
+
+.upload-box strong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 20px;
+  color: var(--white);
+  background: var(--primary);
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.upload-box small {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .field textarea:focus,

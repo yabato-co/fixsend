@@ -218,6 +218,11 @@ function countMatches(text, keywords) {
 }
 
 function extractImportantKeywords(jobData, role) {
+  const hasJobDescription = jobData.words.length > 0;
+  if (!hasJobDescription) {
+    return [...new Set([...(roleKeywords[role] || []), ...generalDesignKeywords])].slice(0, 24);
+  }
+
   const frequentWords = Object.entries(jobData.frequency)
     .filter(([, count]) => count > 1)
     .map(([word]) => word);
@@ -256,6 +261,7 @@ function getStructureChecks(cleanedCv, rawCv) {
 function analyze(cv, job, role) {
   const cvData = normalize(cv);
   const jobData = normalize(job);
+  const hasJobDescription = jobData.words.length > 0;
   const importantKeywords = extractImportantKeywords(jobData, role);
   const matchedKeywords = importantKeywords.filter((keyword) => includesPhrase(cvData.cleaned, keyword));
   const missingKeywords = importantKeywords.filter((keyword) => !includesPhrase(cvData.cleaned, keyword));
@@ -272,13 +278,20 @@ function analyze(cv, job, role) {
   const structureScore = clampScore((structureCount / Object.keys(structure).length) * 10);
   const roleFitScore = clampScore((roleMatches / Math.max(roleSet.length, 1)) * 10);
   const keywordScore = keywordMatchPercentage / 10;
-  const overallScore = clampScore(
-    keywordScore * 0.35 +
-      designKeywordScore * 0.18 +
-      impactScore * 0.16 +
-      structureScore * 0.16 +
-      roleFitScore * 0.15
-  );
+  const overallScore = hasJobDescription
+    ? clampScore(
+        keywordScore * 0.35 +
+          designKeywordScore * 0.18 +
+          impactScore * 0.16 +
+          structureScore * 0.16 +
+          roleFitScore * 0.15
+      )
+    : clampScore(
+        roleFitScore * 0.34 +
+          structureScore * 0.26 +
+          designKeywordScore * 0.22 +
+          impactScore * 0.18
+      );
 
   const criticalGaps = [];
   const isDesignRole = role !== "frontend-developer";
@@ -288,14 +301,18 @@ function analyze(cv, job, role) {
   if (roleMatches === 0) criticalGaps.push("No relevant role keywords found.");
   if (!structure.experience && !structure.projects) criticalGaps.push("No clear experience or projects section.");
   if (impactMatches < 2) criticalGaps.push("Few impact or action words.");
-  if (keywordMatchPercentage < 35) criticalGaps.push("Very low keyword match with the job description.");
+  if (hasJobDescription && keywordMatchPercentage < 35) {
+    criticalGaps.push("Very low keyword match with the job description.");
+  }
 
   let decision = "Fix";
   if (overallScore >= 8 && criticalGaps.length === 0) decision = "Send";
   if (overallScore < 5.5 || criticalGaps.length >= 3 || roleMatches === 0) decision = "Skip";
 
   const strengths = [];
-  if (keywordMatchPercentage >= 65) strengths.push("Your CV mirrors several important job description keywords.");
+  if (hasJobDescription && keywordMatchPercentage >= 65) {
+    strengths.push("Your CV mirrors several important job description keywords.");
+  }
   if (structure.portfolio) strengths.push("Portfolio or project link is visible.");
   if (structure.metrics) strengths.push("You include numbers, metrics, or measurable outcomes.");
   if (impactMatches >= 4) strengths.push("Your CV uses action language that makes achievements easier to scan.");
@@ -308,7 +325,9 @@ function analyze(cv, job, role) {
   if (!weaknesses.length) weaknesses.push("No major weakness detected by the rule-based MVP.");
 
   const quickFixes = [
-    ...missingKeywords.slice(0, 5).map((keyword) => `Add relevant proof for "${keyword}" if it is truthful.`),
+    ...missingKeywords
+      .slice(0, 5)
+      .map((keyword) => `Add relevant proof for "${keyword}" if it is truthful.`),
   ];
   if (!structure.portfolio && isDesignRole) quickFixes.push("Add a portfolio link near your contact details.");
   if (!structure.metrics) quickFixes.push("Rewrite one or two bullets with numbers, outcomes, or scope.");
@@ -319,6 +338,7 @@ function analyze(cv, job, role) {
     decision,
     overallScore: overallScore.toFixed(1),
     keywordMatchPercentage,
+    matchLabel: hasJobDescription ? "Keyword match" : "CV readiness",
     roleFitLevel: roleFitScore >= 7 ? "Strong" : roleFitScore >= 4.5 ? "Medium" : "Low",
     missingKeywords: missingKeywords.slice(0, 10),
     strengths,
@@ -327,7 +347,11 @@ function analyze(cv, job, role) {
     checklist: [
       structure.contact ? "Contact details are visible." : "Add email or contact details.",
       structure.portfolio || !isDesignRole ? "Portfolio requirement looks covered." : "Add a portfolio link.",
-      keywordMatchPercentage >= 55 ? "Keyword match is workable." : "Add more truthful job-specific keywords.",
+      hasJobDescription
+        ? keywordMatchPercentage >= 55
+          ? "Keyword match is workable."
+          : "Add more truthful job-specific keywords."
+        : "Add a job description later if you want application-specific keyword matching.",
       impactMatches >= 3 ? "Action language is present." : "Use stronger action verbs in your bullets.",
       structure.metrics ? "Measurable outcomes are included." : "Add metrics or concrete project scope where possible.",
     ],
@@ -364,6 +388,7 @@ function renderResults(data) {
 
   decisionSummary.textContent = summaries[data.decision];
   document.querySelector("#overallScore").textContent = `${data.overallScore} / 10`;
+  document.querySelector(".metric-card:nth-child(2) span").textContent = data.matchLabel;
   document.querySelector("#keywordMatch").textContent = `${data.keywordMatchPercentage}%`;
   document.querySelector("#roleFit").textContent = data.roleFitLevel;
 
@@ -450,10 +475,12 @@ cvFile.addEventListener("change", async () => {
 });
 
 function validateInputs(cv, job) {
-  if (!cv.trim()) return "Please paste your CV text first.";
-  if (!job.trim()) return "Please paste the job description first.";
-  if (cv.trim().split(/\s+/).length < 35 && job.trim().split(/\s+/).length < 35) {
-    return "Both texts look very short. Paste more detail so FixSend can give a useful result.";
+  if (!cv.trim()) return "Please upload your CV or paste your CV text first.";
+  if (cv.trim().split(/\s+/).length < 35) {
+    return "This CV looks very short. Upload the full CV or paste more detail so FixSend can score it properly.";
+  }
+  if (job.trim() && job.trim().split(/\s+/).length < 20) {
+    return "The job description is optional, but if you use it, paste a little more detail or leave it empty.";
   }
   return "";
 }
