@@ -74,7 +74,7 @@ Planned automated paid flow:
 4. The customer opens `dashboard.html?id=<report-id>`.
 5. Dashboard loads only the paid report by id.
 
-Do not use `dashboard.html?paid=true` for production. Payment verification requires Gumroad webhook or license verification.
+Do not use `dashboard.html?paid=true` for production. It is blocked. Payment verification requires Gumroad webhook or license verification, and real dashboards should open only as `dashboard.html?id=<report-id>`.
 
 ## Supabase SQL
 
