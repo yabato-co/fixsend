@@ -217,7 +217,12 @@ Deno.serve(async (req) => {
     try {
       Object.assign(allFields, JSON.parse(rawBody));
     } catch {
-      const params = new URLSearchParams(rawBody);
+      const normalizedBody = rawBody
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .join("&");
+      const params = new URLSearchParams(normalizedBody);
       Object.assign(allFields, Object.fromEntries(params.entries()));
     }
   }
@@ -226,7 +231,7 @@ Deno.serve(async (req) => {
   const email = String(allFields.email || "");
   const permalink = String(allFields.permalink || allFields.product_permalink || "");
   const urlParamsRaw = String(allFields.url_params || "");
-  let sessionId = String(allFields.session_id || "");
+  let sessionId = String(allFields.session_id || "").trim();
 
   if (permalink && permalink !== expectedProductPermalink) {
     return Response.json({ ok: false, error: "Wrong product" }, { status: 400 });
