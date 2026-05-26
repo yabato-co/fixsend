@@ -44,18 +44,22 @@ Brand color is in `styles.css`:
 
 Main homepage text is in `index.html`, especially the hero section near the top.
 
-## Where to add Tally or Google Form later
+## Tally Fix Pack request form
 
-In `index.html`, find the comment near the **Join early access** button:
+The current Fix Pack request form is:
+
+`https://tally.so/r/44p06b`
+
+In `index.html`, find the comment near the **Request Fix Pack** button:
 
 ```html
-<!-- Replace this mailto link with a Tally or Google Form URL when early access is ready. -->
+<!-- Replace this Tally URL with the Gumroad payment link after the $9 product is ready. -->
 ```
 
-Replace the `mailto:` link with your Tally or Google Form link.
+After the Gumroad product is ready, replace the Tally link with the Gumroad payment link.
 
 ## Where payment or AI can be added later
 
-- Payment can be added later around the **Fix Pack** section in `index.html`.
+- Payment can be added later by replacing the **Request Fix Pack** link in `index.html`.
 - AI-powered reports can be added later by replacing or extending the rule-based logic in `script.js`.
 - For the MVP, everything runs locally in the browser and no CV text is stored.

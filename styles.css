@@ -586,6 +586,13 @@ li {
   max-width: 720px;
 }
 
+.premium-note {
+  display: block;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
 .faq-list {
   display: grid;
   gap: 12px;
