@@ -5,6 +5,7 @@ const dashboardClient = window.supabase.createClient(
 
 const params = new URLSearchParams(window.location.search);
 const reportId = params.get("id");
+const isDemo = params.get("demo") === "true";
 const page = document.querySelector(".dashboard-page");
 
 function listItems(items) {
@@ -108,6 +109,53 @@ function renderDashboard(data) {
 }
 
 async function loadDashboard() {
+  if (isDemo) {
+    renderDashboard({
+      fullName: "Demo Customer",
+      email: "demo@example.com",
+      targetRole: "Product Designer",
+      decision: "Fix",
+      overallScore: 7.2,
+      readinessScore: 68,
+      roleFit: "Medium",
+      diagnosis:
+        "Your CV has potential, but it needs targeted fixes before applying. Focus on role keywords, measurable proof, and clearer positioning.",
+      priorityFixes: [
+        "Add a portfolio link near your contact details.",
+        "Rewrite at least two bullets with numbers, scope, or outcome.",
+        "Add truthful proof for role keywords like design system, usability, and stakeholder collaboration.",
+        "Move the most relevant project closer to the top of the CV.",
+      ],
+      profileSummary:
+        "Product Designer with hands-on experience across interface decisions, prototyping, user flows, and product-focused problem solving.",
+      bulletTemplates: [
+        "Designed [project/interface] for [audience] using [tool/process], improving [metric or user outcome].",
+        "Collaborated with [team/stakeholders] to deliver [feature/project], reducing [problem] and improving [result].",
+        "Built or refined [system/component/workflow] to make [process/product] clearer, faster, or easier to use.",
+      ],
+      missingKeywords: [
+        "design system",
+        "usability testing",
+        "stakeholder collaboration",
+        "metrics",
+        "accessibility",
+      ],
+      strengths: [
+        "Portfolio direction is present.",
+        "Projects are present and can be sharpened.",
+        "You already mention Figma, prototypes, and user flows.",
+      ],
+      beforeApplying: [
+        "Check that the CV opens cleanly as a PDF.",
+        "Make the target role obvious in the top third.",
+        "Add measurable outcomes where possible.",
+        "Use truthful role-specific keywords naturally.",
+      ],
+      nextStep: "Make the priority fixes, then run FixSend again before applying.",
+    });
+    return;
+  }
+
   if (!reportId) {
     page.innerHTML = "<p>Missing dashboard id.</p>";
     return;
