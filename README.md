@@ -62,21 +62,28 @@ In `index.html`, find the comment near the **Get Fix Pack - $9** button:
 
 The site loads Gumroad's overlay script and keeps the checkout links styled with local CSS. If Gumroad's overlay object is available, checkout opens on top of the FixSend page. If the script does not load, the same link still opens the Gumroad checkout page.
 
-## Phase 2 private dashboard delivery
+## Phase 2 automated dashboard delivery
 
 Fix Pack is positioned as a private dashboard.
 
-Manual flow:
+Automated MVP flow:
 
 1. Customer buys Fix Pack on Gumroad.
-2. Customer submits CV details through Tally.
-3. Copy `reports/fixpack-dashboard-template.html`.
-4. Rename the copy with a private-looking slug.
-5. Edit the dashboard content manually.
-6. Push the new file to GitHub.
-7. Email the customer the private dashboard link.
+2. Gumroad receipt/content should send the customer to `submit.html`.
+3. Customer submits purchase email, target role, FixSend score, and CV text.
+4. `submit.js` creates a rule-based Fix Pack dashboard.
+5. The dashboard data is stored in Supabase.
+6. Customer is redirected to `dashboard.html?id=<report-id>`.
 
-See `reports/README.md` for the exact dashboard workflow.
+Email delivery is the next step. Add Resend or another email service after the dashboard flow works.
+
+## Supabase SQL
+
+The full table and policy setup is in:
+
+`supabase.sql`
+
+For the browser-only dashboard MVP, the public anon key needs insert permission on `fixpack_reports`. This is what lets `submit.html` create the dashboard row.
 
 ## Where payment or AI can be added later
 
