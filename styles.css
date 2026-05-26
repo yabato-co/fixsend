@@ -426,6 +426,10 @@ h3 {
   font-weight: 700;
 }
 
+.field .upload-icon {
+  color: var(--white);
+}
+
 .upload-box strong {
   color: var(--ink);
   font-size: 18px;
