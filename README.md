@@ -44,22 +44,26 @@ Brand color is in `styles.css`:
 
 Main homepage text is in `index.html`, especially the hero section near the top.
 
-## Tally Fix Pack request form
+## Fix Pack payment and request links
 
-The current Fix Pack request form is:
+The current Gumroad payment link is:
+
+`https://yabato.gumroad.com/l/fixsend-fix-pack`
+
+The current post-purchase Tally request form is:
 
 `https://tally.so/r/44p06b`
 
-In `index.html`, find the comment near the **Request Fix Pack** button:
+In `index.html`, find the comment near the **Get Fix Pack - $9** button:
 
 ```html
-<!-- Replace this Tally URL with the Gumroad payment link after the $9 product is ready. -->
+<!-- Payment link. After purchase, Gumroad receipt sends customers to https://tally.so/r/44p06b. -->
 ```
 
-After the Gumroad product is ready, replace the Tally link with the Gumroad payment link.
+Gumroad should send paid customers to the Tally form after purchase.
 
 ## Where payment or AI can be added later
 
-- Payment can be added later by replacing the **Request Fix Pack** link in `index.html`.
+- Payment currently uses Gumroad through the **Get Fix Pack - $9** links in `index.html`.
 - AI-powered reports can be added later by replacing or extending the rule-based logic in `script.js`.
 - For the MVP, everything runs locally in the browser and no CV text is stored.
