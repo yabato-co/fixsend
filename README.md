@@ -2,7 +2,7 @@
 
 FixSend by Yabato Co. is a zero-cost static web MVP for job seekers. It helps people decide whether they should **Send**, **Fix**, or **Skip** before applying to a role.
 
-The first version is optimized for designers and creative job seekers. Users paste their CV and a job description, select a target role, and get a browser-only rule-based analysis.
+The first version is optimized for designers and creative job seekers. Users upload or paste their CV, paste a job description, select a target role, and get a browser-only rule-based analysis.
 
 ## How to open locally
 
@@ -12,6 +12,8 @@ The first version is optimized for designers and creative job seekers. Users pas
 3. The site will open in your browser.
 
 No install, npm, backend, database, login, payment, or OpenAI API is needed.
+
+PDF and DOCX reading uses browser-side libraries loaded from public CDNs. If those libraries do not load, users can still paste the CV text manually or upload a TXT file.
 
 ## How to publish with GitHub Pages
 

@@ -177,12 +177,19 @@ const roleKeywords = {
 };
 
 const form = document.querySelector("#analysisForm");
+const cvFile = document.querySelector("#cvFile");
+const cvFileHelp = document.querySelector("#cvFileHelp");
 const cvText = document.querySelector("#cvText");
 const jobText = document.querySelector("#jobText");
 const targetRole = document.querySelector("#targetRole");
 const formMessage = document.querySelector("#formMessage");
 const loadingState = document.querySelector("#loadingState");
 const results = document.querySelector("#results");
+
+if (window.pdfjsLib) {
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+}
 
 function normalize(text) {
   const cleaned = text
@@ -366,6 +373,81 @@ function renderResults(data) {
   renderList("#quickFixes", data.quickFixes, "No quick fixes needed.");
   renderList("#beforeChecklist", data.checklist, "Review your CV once more before applying.");
 }
+
+function setFileHelp(message, isError = false) {
+  cvFileHelp.textContent = message;
+  cvFileHelp.classList.toggle("error-text", isError);
+}
+
+async function readPdfFile(file) {
+  if (!window.pdfjsLib) {
+    throw new Error("PDF reader is still loading. Please try again in a few seconds.");
+  }
+
+  const buffer = await file.arrayBuffer();
+  const pdf = await window.pdfjsLib.getDocument({ data: buffer }).promise;
+  const pages = [];
+
+  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+    const page = await pdf.getPage(pageNumber);
+    const content = await page.getTextContent();
+    pages.push(content.items.map((item) => item.str).join(" "));
+  }
+
+  return pages.join("\n\n");
+}
+
+async function readDocxFile(file) {
+  if (!window.mammoth) {
+    throw new Error("DOCX reader is still loading. Please try again in a few seconds.");
+  }
+
+  const buffer = await file.arrayBuffer();
+  const result = await window.mammoth.extractRawText({ arrayBuffer: buffer });
+  return result.value;
+}
+
+async function readCvFile(file) {
+  const name = file.name.toLowerCase();
+
+  if (name.endsWith(".txt") || file.type === "text/plain") {
+    return file.text();
+  }
+
+  if (name.endsWith(".pdf") || file.type === "application/pdf") {
+    return readPdfFile(file);
+  }
+
+  if (
+    name.endsWith(".docx") ||
+    file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  ) {
+    return readDocxFile(file);
+  }
+
+  throw new Error("Please upload a PDF, DOCX, or TXT file.");
+}
+
+cvFile.addEventListener("change", async () => {
+  const file = cvFile.files[0];
+  if (!file) return;
+
+  setFileHelp("Reading your CV locally in this browser...");
+  formMessage.textContent = "";
+
+  try {
+    const text = await readCvFile(file);
+    if (!text.trim()) {
+      throw new Error("I could not find readable text in this file. Try copying and pasting the CV text instead.");
+    }
+
+    cvText.value = text.trim();
+    setFileHelp(`Loaded "${file.name}". Your CV is not uploaded or stored.`);
+  } catch (error) {
+    cvText.value = "";
+    setFileHelp(`${error.message} You can still paste your CV text into the box below.`, true);
+  }
+});
 
 function validateInputs(cv, job) {
   if (!cv.trim()) return "Please paste your CV text first.";
