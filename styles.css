@@ -391,6 +391,11 @@ h3 {
   font-weight: 800;
 }
 
+.loading-state[hidden],
+.results[hidden] {
+  display: none;
+}
+
 .loading-state span {
   width: 28px;
   height: 28px;
