@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FixSend by Yabato Co.</title>
+    <meta
+      name="description"
+      content="FixSend helps job seekers decide if they should send, fix, or skip before applying."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="FixSend home">
+        <span class="brand-mark">FS</span>
+        <span>
+          <strong>FixSend</strong>
+          <small>by Yabato Co.</small>
+        </span>
+      </a>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#how-it-works">How it works</a>
+        <a href="#try-it">Try it</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero section">
+        <div class="hero-content">
+          <p class="eyebrow">Pre-apply decision engine</p>
+          <h1>Know if you should send, fix, or skip before applying.</h1>
+          <p class="hero-copy">
+            Paste your CV and a job description. FixSend gives you an instant decision,
+            match score, missing keywords, and quick fixes. No signup required.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#try-it">Check for free</a>
+            <span class="privacy-note">Your CV stays in your browser.</span>
+          </div>
+        </div>
+        <div class="decision-preview" aria-label="FixSend decision preview">
+          <div class="preview-topline">
+            <span>Decision</span>
+            <strong>8.4 / 10</strong>
+          </div>
+          <div class="preview-decision send">Send</div>
+          <div class="preview-bars">
+            <span style="--bar-width: 86%"></span>
+            <span style="--bar-width: 74%"></span>
+            <span style="--bar-width: 92%"></span>
+          </div>
+          <p>Strong portfolio, relevant tools, and clear product design keywords.</p>
+        </div>
+      </section>
+
+      <section class="section compact" id="how-it-works">
+        <div class="section-heading">
+          <p class="eyebrow">How it works</p>
+          <h2>Three steps before you apply.</h2>
+        </div>
+        <div class="steps">
+          <article>
+            <span>1</span>
+            <h3>Paste your CV</h3>
+            <p>Add your CV text exactly as you would send it.</p>
+          </article>
+          <article>
+            <span>2</span>
+            <h3>Paste the job description</h3>
+            <p>FixSend compares your CV against the role's language.</p>
+          </article>
+          <article>
+            <span>3</span>
+            <h3>Get your decision</h3>
+            <p>See whether to send, fix, or skip with quick next steps.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section tool-section" id="try-it">
+        <div class="section-heading">
+          <p class="eyebrow">Try FixSend</p>
+          <h2>Check your application fit.</h2>
+          <p>
+            Your CV text is analyzed locally in your browser. We do not store your CV.
+          </p>
+        </div>
+
+        <form class="tool-grid" id="analysisForm" novalidate>
+          <label class="field cv-field">
+            <span>CV text</span>
+            <textarea
+              id="cvText"
+              rows="12"
+              placeholder="Paste your CV text here..."
+            ></textarea>
+          </label>
+
+          <label class="field jd-field">
+            <span>Job description</span>
+            <textarea
+              id="jobText"
+              rows="12"
+              placeholder="Paste the job description here..."
+            ></textarea>
+          </label>
+
+          <label class="field">
+            <span>Target role</span>
+            <select id="targetRole">
+              <option value="ux-designer">UX Designer</option>
+              <option value="ui-designer">UI Designer</option>
+              <option value="product-designer">Product Designer</option>
+              <option value="web-designer">Web Designer</option>
+              <option value="graphic-designer">Graphic Designer</option>
+              <option value="frontend-developer">Frontend Developer</option>
+              <option value="junior-designer">Junior Designer</option>
+              <option value="career-switcher">Career Switcher</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Email <em>optional</em></span>
+            <input id="emailInput" type="email" placeholder="you@example.com" />
+          </label>
+
+          <div class="form-actions">
+            <button class="button primary" type="submit" id="analyzeButton">Analyze</button>
+            <p id="formMessage" class="form-message" role="alert"></p>
+          </div>
+        </form>
+
+        <div class="loading-state" id="loadingState" aria-live="polite" hidden>
+          <span></span>
+          <p>Checking your CV against the role...</p>
+        </div>
+
+        <section class="results" id="results" aria-live="polite" hidden>
+          <div class="result-hero">
+            <div>
+              <p class="eyebrow">FixSend decision</p>
+              <h2 id="decisionTitle">Fix</h2>
+              <p id="decisionSummary"></p>
+            </div>
+            <span class="decision-badge" id="decisionBadge">Fix</span>
+          </div>
+
+          <div class="metric-grid">
+            <article class="metric-card">
+              <span>Overall match</span>
+              <strong id="overallScore">0 / 10</strong>
+            </article>
+            <article class="metric-card">
+              <span>Keyword match</span>
+              <strong id="keywordMatch">0%</strong>
+            </article>
+            <article class="metric-card">
+              <span>Role fit</span>
+              <strong id="roleFit">Medium</strong>
+            </article>
+          </div>
+
+          <div class="insight-grid">
+            <article>
+              <h3>Missing keywords</h3>
+              <ul id="missingKeywords"></ul>
+            </article>
+            <article>
+              <h3>Strengths</h3>
+              <ul id="strengths"></ul>
+            </article>
+            <article>
+              <h3>Weaknesses</h3>
+              <ul id="weaknesses"></ul>
+            </article>
+            <article>
+              <h3>Quick fixes</h3>
+              <ul id="quickFixes"></ul>
+            </article>
+          </div>
+
+          <article class="checklist">
+            <h3>Before applying</h3>
+            <ul id="beforeChecklist"></ul>
+          </article>
+        </section>
+      </section>
+
+      <section class="section premium-section">
+        <div>
+          <p class="eyebrow">Premium teaser</p>
+          <h2>Coming soon: Fix Pack</h2>
+          <p>
+            Soon, FixSend will generate rewritten CV bullets, a tailored cover letter,
+            interview questions, and a downloadable application report.
+          </p>
+        </div>
+        <!-- Replace this mailto link with a Tally or Google Form URL when early access is ready. -->
+        <a class="button secondary" href="mailto:hello@yabato.co?subject=FixSend%20early%20access">
+          Join early access
+        </a>
+      </section>
+
+      <section class="section compact" id="faq">
+        <div class="section-heading">
+          <p class="eyebrow">FAQ</p>
+          <h2>Helpful answers.</h2>
+        </div>
+        <div class="faq-list">
+          <details>
+            <summary>Is FixSend AI-powered?</summary>
+            <p>The free MVP uses rule-based analysis. AI-powered deep reports may come later.</p>
+          </details>
+          <details>
+            <summary>Do I need an account?</summary>
+            <p>No.</p>
+          </details>
+          <details>
+            <summary>Is my CV stored?</summary>
+            <p>No. In this MVP, your CV is analyzed locally in your browser.</p>
+          </details>
+          <details>
+            <summary>Is it only for designers?</summary>
+            <p>It is optimized for designers and creative roles, but other job seekers can test it too.</p>
+          </details>
+          <details>
+            <summary>Does this guarantee interviews?</summary>
+            <p>No. It helps you identify gaps before applying.</p>
+          </details>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>FixSend by Yabato Co.</span>
+      <span>Built as a zero-cost static MVP.</span>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
