@@ -38,8 +38,8 @@
           <p class="eyebrow">Pre-apply decision engine</p>
           <h1>Know if you should send, fix, or skip before applying.</h1>
           <p class="hero-copy">
-            Upload your CV and get an instant Send, Fix, or Skip signal. Add a job
-            description only if you want a sharper match score. No signup required.
+            Upload your CV and get an instant Send, Fix, or Skip signal with a score,
+            strengths, gaps, and quick fixes. No signup required.
           </p>
           <div class="hero-actions">
             <a class="button primary" href="#try-it">Check for free</a>
@@ -95,16 +95,17 @@
         </div>
 
         <form class="tool-grid" id="analysisForm" novalidate>
-          <label class="field cv-field">
+          <div class="field cv-field">
             <span>Your CV / resume</span>
-            <div class="upload-box">
+            <div class="upload-box" id="uploadBox">
               <input
                 id="cvFile"
                 type="file"
                 accept=".txt,.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
               />
               <label for="cvFile">
-                <strong>Upload CV</strong>
+                <span class="upload-icon">+</span>
+                <strong>Drop your CV here or choose a file</strong>
                 <small>PDF, DOCX, or TXT. Read locally in your browser.</small>
               </label>
             </div>
@@ -114,16 +115,7 @@
               rows="12"
               placeholder="CV preview appears here after upload. You can also paste your CV text manually."
             ></textarea>
-          </label>
-
-          <label class="field jd-field">
-            <span>Job description <em>optional</em></span>
-            <textarea
-              id="jobText"
-              rows="12"
-              placeholder="Optional: paste a job description for a sharper application match. You can leave this empty."
-            ></textarea>
-          </label>
+          </div>
 
           <label class="field">
             <span>Target role</span>
@@ -171,7 +163,7 @@
               <strong id="overallScore">0 / 10</strong>
             </article>
             <article class="metric-card">
-              <span>Keyword match</span>
+              <span>CV readiness</span>
               <strong id="keywordMatch">0%</strong>
             </article>
             <article class="metric-card">

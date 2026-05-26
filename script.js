@@ -177,10 +177,10 @@ const roleKeywords = {
 };
 
 const form = document.querySelector("#analysisForm");
+const uploadBox = document.querySelector("#uploadBox");
 const cvFile = document.querySelector("#cvFile");
 const cvFileHelp = document.querySelector("#cvFileHelp");
 const cvText = document.querySelector("#cvText");
-const jobText = document.querySelector("#jobText");
 const targetRole = document.querySelector("#targetRole");
 const formMessage = document.querySelector("#formMessage");
 const loadingState = document.querySelector("#loadingState");
@@ -217,23 +217,8 @@ function countMatches(text, keywords) {
   return keywords.filter((keyword) => includesPhrase(text, keyword)).length;
 }
 
-function extractImportantKeywords(jobData, role) {
-  const hasJobDescription = jobData.words.length > 0;
-  if (!hasJobDescription) {
-    return [...new Set([...(roleKeywords[role] || []), ...generalDesignKeywords])].slice(0, 24);
-  }
-
-  const frequentWords = Object.entries(jobData.frequency)
-    .filter(([, count]) => count > 1)
-    .map(([word]) => word);
-
-  const roleSet = roleKeywords[role] || [];
-  const designFromJob = generalDesignKeywords.filter((keyword) =>
-    includesPhrase(jobData.cleaned, keyword)
-  );
-  const roleFromJob = roleSet.filter((keyword) => includesPhrase(jobData.cleaned, keyword));
-
-  return [...new Set([...roleFromJob, ...designFromJob, ...frequentWords])].slice(0, 24);
+function getCvReadinessKeywords(role) {
+  return [...new Set([...(roleKeywords[role] || []), ...generalDesignKeywords])].slice(0, 24);
 }
 
 function percent(part, total) {
@@ -258,11 +243,9 @@ function getStructureChecks(cleanedCv, rawCv) {
   };
 }
 
-function analyze(cv, job, role) {
+function analyze(cv, role) {
   const cvData = normalize(cv);
-  const jobData = normalize(job);
-  const hasJobDescription = jobData.words.length > 0;
-  const importantKeywords = extractImportantKeywords(jobData, role);
+  const importantKeywords = getCvReadinessKeywords(role);
   const matchedKeywords = importantKeywords.filter((keyword) => includesPhrase(cvData.cleaned, keyword));
   const missingKeywords = importantKeywords.filter((keyword) => !includesPhrase(cvData.cleaned, keyword));
   const roleSet = roleKeywords[role] || [];
@@ -277,21 +260,12 @@ function analyze(cv, job, role) {
   const impactScore = clampScore((impactMatches / 7) * 10);
   const structureScore = clampScore((structureCount / Object.keys(structure).length) * 10);
   const roleFitScore = clampScore((roleMatches / Math.max(roleSet.length, 1)) * 10);
-  const keywordScore = keywordMatchPercentage / 10;
-  const overallScore = hasJobDescription
-    ? clampScore(
-        keywordScore * 0.35 +
-          designKeywordScore * 0.18 +
-          impactScore * 0.16 +
-          structureScore * 0.16 +
-          roleFitScore * 0.15
-      )
-    : clampScore(
-        roleFitScore * 0.34 +
-          structureScore * 0.26 +
-          designKeywordScore * 0.22 +
-          impactScore * 0.18
-      );
+  const overallScore = clampScore(
+    roleFitScore * 0.34 +
+      structureScore * 0.26 +
+      designKeywordScore * 0.22 +
+      impactScore * 0.18
+  );
 
   const criticalGaps = [];
   const isDesignRole = role !== "frontend-developer";
@@ -301,18 +275,12 @@ function analyze(cv, job, role) {
   if (roleMatches === 0) criticalGaps.push("No relevant role keywords found.");
   if (!structure.experience && !structure.projects) criticalGaps.push("No clear experience or projects section.");
   if (impactMatches < 2) criticalGaps.push("Few impact or action words.");
-  if (hasJobDescription && keywordMatchPercentage < 35) {
-    criticalGaps.push("Very low keyword match with the job description.");
-  }
 
   let decision = "Fix";
   if (overallScore >= 8 && criticalGaps.length === 0) decision = "Send";
   if (overallScore < 5.5 || criticalGaps.length >= 3 || roleMatches === 0) decision = "Skip";
 
   const strengths = [];
-  if (hasJobDescription && keywordMatchPercentage >= 65) {
-    strengths.push("Your CV mirrors several important job description keywords.");
-  }
   if (structure.portfolio) strengths.push("Portfolio or project link is visible.");
   if (structure.metrics) strengths.push("You include numbers, metrics, or measurable outcomes.");
   if (impactMatches >= 4) strengths.push("Your CV uses action language that makes achievements easier to scan.");
@@ -338,7 +306,7 @@ function analyze(cv, job, role) {
     decision,
     overallScore: overallScore.toFixed(1),
     keywordMatchPercentage,
-    matchLabel: hasJobDescription ? "Keyword match" : "CV readiness",
+    matchLabel: "CV readiness",
     roleFitLevel: roleFitScore >= 7 ? "Strong" : roleFitScore >= 4.5 ? "Medium" : "Low",
     missingKeywords: missingKeywords.slice(0, 10),
     strengths,
@@ -347,11 +315,7 @@ function analyze(cv, job, role) {
     checklist: [
       structure.contact ? "Contact details are visible." : "Add email or contact details.",
       structure.portfolio || !isDesignRole ? "Portfolio requirement looks covered." : "Add a portfolio link.",
-      hasJobDescription
-        ? keywordMatchPercentage >= 55
-          ? "Keyword match is workable."
-          : "Add more truthful job-specific keywords."
-        : "Add a job description later if you want application-specific keyword matching.",
+      keywordMatchPercentage >= 55 ? "Role keywords are workable." : "Add more truthful role-specific keywords.",
       impactMatches >= 3 ? "Action language is present." : "Use stronger action verbs in your bullets.",
       structure.metrics ? "Measurable outcomes are included." : "Add metrics or concrete project scope where possible.",
     ],
@@ -453,8 +417,7 @@ async function readCvFile(file) {
   throw new Error("Please upload a PDF, DOCX, or TXT file.");
 }
 
-cvFile.addEventListener("change", async () => {
-  const file = cvFile.files[0];
+async function handleCvFile(file) {
   if (!file) return;
 
   setFileHelp("Reading your CV locally in this browser...");
@@ -472,15 +435,34 @@ cvFile.addEventListener("change", async () => {
     cvText.value = "";
     setFileHelp(`${error.message} You can still paste your CV text into the box below.`, true);
   }
+}
+
+cvFile.addEventListener("change", async () => {
+  await handleCvFile(cvFile.files[0]);
 });
 
-function validateInputs(cv, job) {
+["dragenter", "dragover"].forEach((eventName) => {
+  uploadBox.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    uploadBox.classList.add("is-dragging");
+  });
+});
+
+["dragleave", "drop"].forEach((eventName) => {
+  uploadBox.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    uploadBox.classList.remove("is-dragging");
+  });
+});
+
+uploadBox.addEventListener("drop", async (event) => {
+  await handleCvFile(event.dataTransfer.files[0]);
+});
+
+function validateInputs(cv) {
   if (!cv.trim()) return "Please upload your CV or paste your CV text first.";
   if (cv.trim().split(/\s+/).length < 35) {
     return "This CV looks very short. Upload the full CV or paste more detail so FixSend can score it properly.";
-  }
-  if (job.trim() && job.trim().split(/\s+/).length < 20) {
-    return "The job description is optional, but if you use it, paste a little more detail or leave it empty.";
   }
   return "";
 }
@@ -490,7 +472,7 @@ form.addEventListener("submit", (event) => {
   formMessage.textContent = "";
   results.hidden = true;
 
-  const error = validateInputs(cvText.value, jobText.value);
+  const error = validateInputs(cvText.value);
   if (error) {
     formMessage.textContent = error;
     return;
@@ -499,7 +481,7 @@ form.addEventListener("submit", (event) => {
   loadingState.hidden = false;
 
   window.setTimeout(() => {
-    const data = analyze(cvText.value, jobText.value, targetRole.value);
+    const data = analyze(cvText.value, targetRole.value);
     renderResults(data);
     loadingState.hidden = true;
     results.hidden = false;
