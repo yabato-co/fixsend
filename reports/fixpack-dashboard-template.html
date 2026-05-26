@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fix Pack Dashboard - Customer Name</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary: #2444e5;
+        --ink: #121521;
+        --muted: #626a7f;
+        --line: #e5e9f5;
+        --soft: #f6f8ff;
+        --white: #ffffff;
+        --send: #0f9f6e;
+        --fix: #d98211;
+        --skip: #d93d4a;
+        --shadow: 0 18px 50px rgba(22, 33, 74, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background: linear-gradient(180deg, #fbfcff 0%, #f5f7ff 100%);
+        font-family: "Inter", Arial, sans-serif;
+      }
+
+      .page {
+        width: min(1120px, calc(100% - 36px));
+        margin: 0 auto;
+        padding: 36px 0 64px;
+      }
+
+      .topbar,
+      .hero,
+      .card,
+      .action-panel {
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow);
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 22px;
+        padding: 18px 20px;
+        border-radius: 20px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 800;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 42px;
+        height: 42px;
+        place-items: center;
+        color: var(--white);
+        background: var(--primary);
+        border-radius: 14px;
+      }
+
+      .status {
+        color: var(--primary);
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 24px;
+        margin-bottom: 22px;
+        padding: 28px;
+        border-radius: 24px;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+
+      h1 {
+        margin-bottom: 12px;
+        font-size: 42px;
+        line-height: 1.05;
+      }
+
+      h2 {
+        margin-bottom: 14px;
+        font-size: 25px;
+      }
+
+      h3 {
+        margin-bottom: 10px;
+        font-size: 18px;
+      }
+
+      p,
+      li {
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .decision {
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: var(--soft);
+        border: 1px solid #e8edff;
+        border-radius: 20px;
+        text-align: center;
+      }
+
+      .decision strong {
+        color: var(--fix);
+        font-size: 56px;
+        line-height: 1;
+      }
+
+      .decision span {
+        margin-top: 10px;
+        color: var(--muted);
+        font-weight: 800;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .card,
+      .action-panel {
+        padding: 22px;
+        border-radius: 20px;
+      }
+
+      .metric-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-top: 18px;
+      }
+
+      .metric {
+        padding: 16px;
+        background: var(--soft);
+        border: 1px solid #e8edff;
+        border-radius: 16px;
+      }
+
+      .metric span {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .metric strong {
+        font-size: 24px;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      .rewrite {
+        display: grid;
+        gap: 12px;
+      }
+
+      .rewrite-block {
+        padding: 16px;
+        background: var(--soft);
+        border: 1px solid #e8edff;
+        border-radius: 16px;
+      }
+
+      .rewrite-block span {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--primary);
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .action-panel {
+        margin-top: 18px;
+        background: linear-gradient(135deg, #eef3ff 0%, #ffffff 72%);
+      }
+
+      .footer {
+        margin-top: 28px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      @media (max-width: 820px) {
+        .hero,
+        .grid,
+        .metric-row {
+          grid-template-columns: 1fr;
+        }
+
+        h1 {
+          font-size: 34px;
+        }
+
+        .topbar {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark">FS</span>
+          <span>FixSend Fix Pack</span>
+        </div>
+        <span class="status">Private dashboard</span>
+      </header>
+
+      <section class="hero">
+        <div>
+          <p class="status">Prepared for Customer Name</p>
+          <h1>Your CV needs a focused fix before applying.</h1>
+          <p>
+            This dashboard turns your FixSend result into a concrete improvement plan.
+            Use it to update your CV before sending your next application.
+          </p>
+          <div class="metric-row">
+            <div class="metric">
+              <span>FixSend score</span>
+              <strong>6.7 / 10</strong>
+            </div>
+            <div class="metric">
+              <span>Role fit</span>
+              <strong>Medium</strong>
+            </div>
+            <div class="metric">
+              <span>Priority</span>
+              <strong>Fix</strong>
+            </div>
+          </div>
+        </div>
+        <aside class="decision">
+          <strong>Fix</strong>
+          <span>Apply after the priority changes below.</span>
+        </aside>
+      </section>
+
+      <section class="grid">
+        <article class="card">
+          <h2>CV Diagnosis</h2>
+          <p>
+            The CV has relevant direction, but the strongest evidence is not visible
+            enough. The biggest gaps are role-specific keywords, measurable impact,
+            and sharper project outcomes.
+          </p>
+        </article>
+
+        <article class="card">
+          <h2>Priority Fixes</h2>
+          <ul>
+            <li>Add a portfolio link near contact details.</li>
+            <li>Make the target role clear in the first 5 seconds.</li>
+            <li>Rewrite 3 bullets with action, scope, and measurable result.</li>
+            <li>Add truthful role keywords such as design system and usability.</li>
+            <li>Move strongest projects closer to the top.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2>Profile Summary</h2>
+          <div class="rewrite">
+            <div class="rewrite-block">
+              <span>Suggested direction</span>
+              <p>
+                Product-focused designer with hands-on experience in user flows,
+                responsive interfaces, prototyping, and design system components.
+                Strong at turning research and feedback into clear interface decisions.
+              </p>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Bullet Rewrite Guidance</h2>
+          <div class="rewrite">
+            <div class="rewrite-block">
+              <span>Template</span>
+              <p>
+                Designed [project/interface] for [audience] using [tools/process],
+                improving [metric/outcome] by [number or concrete result].
+              </p>
+            </div>
+            <div class="rewrite-block">
+              <span>Example</span>
+              <p>
+                Designed a mobile onboarding flow in Figma, tested prototypes with
+                users, and improved completion clarity through simplified steps.
+              </p>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Missing Keywords</h2>
+          <ul>
+            <li>user research</li>
+            <li>usability testing</li>
+            <li>design system</li>
+            <li>accessibility</li>
+            <li>stakeholder collaboration</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2>Before Applying</h2>
+          <ul>
+            <li>Confirm the portfolio link opens correctly.</li>
+            <li>Make the top third of the CV match the target role.</li>
+            <li>Add at least two measurable outcomes.</li>
+            <li>Remove generic tasks that do not prove role fit.</li>
+            <li>Export as PDF and check spacing before sending.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="action-panel">
+        <h2>Next Step Recommendation</h2>
+        <p>
+          Do not send this CV yet. Make the priority fixes first, then run FixSend
+          again. If the score reaches 8.0 or higher and the portfolio is clear,
+          this application becomes much stronger.
+        </p>
+      </section>
+
+      <p class="footer">
+        FixSend by Yabato Co. This private dashboard is prepared manually during
+        the early Fix Pack phase.
+      </p>
+    </main>
+  </body>
+</html>
