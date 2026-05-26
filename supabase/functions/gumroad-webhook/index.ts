@@ -200,8 +200,21 @@ function createDashboard(input: FixPackInput) {
 Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
 
-  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const supabaseUrl = Deno.env.get("FIXSEND_SUPABASE_URL") || Deno.env.get("SUPABASE_URL");
+  const serviceRoleKey =
+    Deno.env.get("FIXSEND_SERVICE_ROLE_KEY") || Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    return Response.json(
+      {
+        ok: false,
+        error: "Missing Supabase environment variables",
+        has_supabase_url: Boolean(supabaseUrl),
+        has_service_role_key: Boolean(serviceRoleKey),
+      },
+      { status: 500 },
+    );
+  }
   const dashboardBaseUrl = Deno.env.get("FIXSEND_DASHBOARD_BASE_URL") || "https://yabato-co.github.io/fixsend/dashboard.html";
   const expectedProductPermalink = Deno.env.get("GUMROAD_PRODUCT_PERMALINK") || "fixsend-fix-pack";
   const supabase = createClient(supabaseUrl, serviceRoleKey);
@@ -258,7 +271,24 @@ Deno.serve(async (req) => {
     .single();
 
   if (sessionError || !session) {
-    return Response.json({ ok: false, error: "Session not found" }, { status: 404 });
+    const { data: recentSessions, error: recentError } = await supabase
+      .from("fixpack_sessions")
+      .select("id,status,target_role,created_at")
+      .order("created_at", { ascending: false })
+      .limit(5);
+
+    return Response.json(
+      {
+        ok: false,
+        error: "Session not found",
+        looked_for_session_id: sessionId,
+        session_id_length: sessionId.length,
+        session_error: sessionError?.message || null,
+        recent_sessions: recentSessions || [],
+        recent_error: recentError?.message || null,
+      },
+      { status: 404 },
+    );
   }
 
   if (session.report_id) {
