@@ -46,9 +46,9 @@ Main homepage text is in `index.html`, especially the hero section near the top.
 
 ## Fix Pack payment and request links
 
-The current Gumroad payment link is:
+The current Gumroad direct checkout link is:
 
-`https://yabato.gumroad.com/l/fixsend-fix-pack`
+`https://yabato.gumroad.com/l/fixsend-fix-pack?wanted=true`
 
 The current post-purchase Tally request form is:
 
@@ -57,10 +57,10 @@ The current post-purchase Tally request form is:
 In `index.html`, find the comment near the **Get Fix Pack - $9** button:
 
 ```html
-<!-- Payment link. After purchase, Gumroad receipt sends customers to https://tally.so/r/44p06b. -->
+<!-- Gumroad overlay checkout. After purchase, Gumroad receipt sends customers to https://tally.so/r/44p06b. -->
 ```
 
-Gumroad should send paid customers to the Tally form after purchase.
+The site loads Gumroad's overlay script so the checkout can open on top of the FixSend page. If the script does not load, the same link still opens the Gumroad checkout page.
 
 ## Where payment or AI can be added later
 
