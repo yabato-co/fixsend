@@ -185,6 +185,11 @@ const targetRole = document.querySelector("#targetRole");
 const formMessage = document.querySelector("#formMessage");
 const loadingState = document.querySelector("#loadingState");
 const results = document.querySelector("#results");
+const gumroadBaseUrl = "https://yabato.gumroad.com/l/fixsend-fix-pack?wanted=true";
+const browserSupabase = window.supabase?.createClient(
+  FIXSEND_SUPABASE_URL,
+  FIXSEND_SUPABASE_ANON_KEY
+);
 
 const roleLabels = {
   "ux-designer": "UX Designer",
@@ -378,6 +383,38 @@ function renderResults(data) {
   );
 }
 
+function setCheckoutSession(sessionId) {
+  const checkoutUrl = sessionId
+    ? `${gumroadBaseUrl}&session_id=${encodeURIComponent(sessionId)}`
+    : gumroadBaseUrl;
+
+  document.querySelectorAll(".checkout-button").forEach((button) => {
+    button.href = checkoutUrl;
+  });
+}
+
+async function createPendingSession(data) {
+  if (!browserSupabase) return null;
+
+  const { data: session, error } = await browserSupabase
+    .from("fixpack_sessions")
+    .insert({
+      status: "pending",
+      target_role: roleLabels[targetRole.value] || "Product Designer",
+      cv_text: cvText.value,
+      free_result: data,
+    })
+    .select("id")
+    .single();
+
+  if (error) {
+    console.warn("Fix Pack session could not be created", error);
+    return null;
+  }
+
+  return session.id;
+}
+
 function setFileHelp(message, isError = false) {
   cvFileHelp.textContent = message;
   cvFileHelp.classList.toggle("error-text", isError);
@@ -495,7 +532,7 @@ form.addEventListener("submit", (event) => {
 
   loadingState.hidden = false;
 
-  window.setTimeout(() => {
+  window.setTimeout(async () => {
     const data = analyze(cvText.value, targetRole.value);
     localStorage.setItem(
       "fixsendLastAnalysis",
@@ -507,6 +544,9 @@ form.addEventListener("submit", (event) => {
         createdAt: new Date().toISOString(),
       })
     );
+    const sessionId = await createPendingSession(data);
+    localStorage.setItem("fixsendLastSessionId", sessionId || "");
+    setCheckoutSession(sessionId);
     renderResults(data);
     loadingState.hidden = true;
     results.hidden = false;
@@ -516,6 +556,12 @@ form.addEventListener("submit", (event) => {
 
 document.querySelectorAll(".checkout-button").forEach((button) => {
   button.addEventListener("click", (event) => {
+    if (button.getAttribute("href") === "#") {
+      event.preventDefault();
+      formMessage.textContent = "Run the CV analysis first so FixSend can create your private checkout session.";
+      return;
+    }
+
     if (window.GumroadOverlay) {
       event.preventDefault();
       window.GumroadOverlay.open(button.href);

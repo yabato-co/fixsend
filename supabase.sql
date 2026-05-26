@@ -54,3 +54,9 @@ with check (
   and target_role is not null
   and free_result is not null
 );
+
+drop policy if exists "Allow public session read" on public.fixpack_sessions;
+create policy "Allow public session read"
+on public.fixpack_sessions
+for select
+using (true);
