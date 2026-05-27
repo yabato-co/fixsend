@@ -204,7 +204,7 @@ function renderDashboard(data) {
   page.innerHTML = `
     <header class="dashboard-topbar">
       <a class="dashboard-brand" href="index.html">
-        <span>FS</span>
+        <span><img src="fixsend-logo.svg" alt="" /></span>
         <strong>FixSend Fix Pack</strong>
       </a>
       <div class="topbar-actions">
@@ -368,7 +368,7 @@ async function loadDashboard() {
     page.innerHTML = `
       <header class="dashboard-topbar">
         <a class="dashboard-brand" href="index.html">
-          <span>FS</span>
+          <span><img src="fixsend-logo.svg" alt="" /></span>
           <strong>FixSend Fix Pack</strong>
         </a>
         <p>Private dashboard</p>

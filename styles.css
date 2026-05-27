@@ -108,11 +108,19 @@ textarea {
   display: grid;
   width: 42px;
   height: 42px;
+  min-width: 42px;
+  flex: 0 0 42px;
   place-items: center;
-  color: var(--white);
+  overflow: hidden;
   background: var(--primary);
   border-radius: 14px;
-  font-weight: 800;
+  box-shadow: 0 10px 22px rgba(36, 68, 229, 0.2);
+}
+
+.brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .brand strong,
