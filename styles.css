@@ -22,12 +22,44 @@ html {
 }
 
 body {
+  position: relative;
   margin: 0;
   color: var(--ink);
   background:
     radial-gradient(circle at top left, rgba(36, 68, 229, 0.12), transparent 30rem),
     linear-gradient(180deg, #fbfcff 0%, #ffffff 40%, #f7f9ff 100%);
   font-family: "Inter", Arial, sans-serif;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: -24%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(36, 68, 229, 0.16), transparent 28%),
+    radial-gradient(circle at 82% 12%, rgba(97, 200, 255, 0.12), transparent 24%),
+    radial-gradient(circle at 72% 78%, rgba(15, 159, 110, 0.1), transparent 26%),
+    radial-gradient(circle at 20% 84%, rgba(217, 130, 17, 0.08), transparent 22%);
+  opacity: 0.62;
+  filter: blur(8px);
+  transform: translate3d(0, 0, 0);
+  animation: pageGradientDrift 22s ease-in-out infinite alternate;
+}
+
+@keyframes pageGradientDrift {
+  0% {
+    transform: translate3d(-1.5%, -1%, 0) scale(1);
+  }
+
+  50% {
+    transform: translate3d(1.2%, 1.6%, 0) scale(1.03);
+  }
+
+  100% {
+    transform: translate3d(2%, -1.2%, 0) scale(1.01);
+  }
 }
 
 a {
@@ -242,6 +274,19 @@ h3 {
   color: var(--muted);
   font-size: 14px;
   font-weight: 700;
+}
+
+.language-note {
+  max-width: 620px;
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  color: #344061;
+  background: #eef3ff;
+  border: 1px solid #dfe6ff;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.5;
 }
 
 .decision-preview,
@@ -1043,5 +1088,11 @@ li {
 
   .nav-links {
     font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation: none;
   }
 }
