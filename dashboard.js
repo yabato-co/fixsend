@@ -271,8 +271,8 @@ function renderDashboard(data) {
         <p class="eyebrow">Dashboard includes</p>
         <h2>What your Fix Pack covers</h2>
         <p>
-          This report scores the signals recruiters look for in a UX/product design CV:
-          portfolio visibility, UX process, measurable impact, role language, and scan clarity.
+          This report scores the signals recruiters look for in your selected role:
+          portfolio or project proof, process clarity, measurable impact, role language, and scan clarity.
         </p>
       </div>
       <ul class="pill-list">

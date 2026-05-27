@@ -23,11 +23,17 @@ const fixPackStopWords = new Set([
 
 const fixPackRoleKeywords = {
   "ux-designer": ["ux", "research", "persona", "journey", "usability", "prototype", "wireframe", "user flow"],
+  "ux-researcher": ["research", "interview", "survey", "usability", "user testing", "persona", "journey", "insight", "synthesis", "qualitative", "quantitative"],
+  "ux-writer": ["content", "ux writing", "microcopy", "voice", "tone", "content strategy", "information architecture", "user journey", "accessibility", "localization"],
   "ui-designer": ["ui", "visual", "typography", "layout", "component", "design system", "figma"],
   "product-designer": ["product", "metrics", "stakeholder", "prototype", "research", "design system", "handoff"],
   "web-designer": ["web", "responsive", "layout", "landing", "typography", "figma", "html", "css"],
+  "brand-designer": ["brand", "identity", "visual system", "guidelines", "typography", "logo", "campaign", "art direction", "layout", "presentation"],
   "graphic-designer": ["brand", "visual", "typography", "layout", "illustration", "adobe", "campaign"],
+  "motion-designer": ["motion", "animation", "storyboard", "after effects", "video", "lottie", "timeline", "transition", "campaign", "visual"],
+  "marketing-designer": ["campaign", "landing page", "conversion", "social", "email", "ad", "brand", "layout", "creative", "performance"],
   "frontend-developer": ["frontend", "javascript", "html", "css", "react", "responsive", "accessibility"],
+  "webflow-developer": ["webflow", "no-code", "cms", "responsive", "landing", "seo", "animation", "html", "css", "figma"],
   "junior-designer": ["junior", "figma", "portfolio", "project", "wireframe", "prototype", "research"],
   "career-switcher": ["transferable", "project", "portfolio", "learning", "collaborated", "research"],
 };

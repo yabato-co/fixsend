@@ -9,11 +9,17 @@ type FixPackInput = {
 
 const roleKeywords: Record<string, string[]> = {
   "UX Designer": ["ux", "research", "persona", "journey", "usability", "prototype", "wireframe", "user flow"],
+  "UX Researcher": ["research", "interview", "survey", "usability", "user testing", "persona", "journey", "insight", "synthesis", "qualitative", "quantitative"],
+  "UX Writer / Content Designer": ["content", "ux writing", "microcopy", "voice", "tone", "content strategy", "information architecture", "user journey", "accessibility", "localization"],
   "UI Designer": ["ui", "visual", "typography", "layout", "component", "design system", "figma"],
   "Product Designer": ["product", "metrics", "stakeholder", "prototype", "research", "design system", "handoff"],
   "Web Designer": ["web", "responsive", "layout", "landing", "typography", "figma", "html", "css"],
+  "Brand Designer": ["brand", "identity", "visual system", "guidelines", "typography", "logo", "campaign", "art direction", "layout", "presentation"],
   "Graphic Designer": ["brand", "visual", "typography", "layout", "illustration", "adobe", "campaign"],
+  "Motion Designer": ["motion", "animation", "storyboard", "after effects", "video", "lottie", "timeline", "transition", "campaign", "visual"],
+  "Marketing Designer": ["campaign", "landing page", "conversion", "social", "email", "ad", "brand", "layout", "creative", "performance"],
   "Frontend Developer": ["frontend", "javascript", "html", "css", "react", "responsive", "accessibility"],
+  "Webflow / No-Code Developer": ["webflow", "no-code", "cms", "responsive", "landing", "seo", "animation", "html", "css", "figma"],
   "Junior Designer": ["junior", "figma", "portfolio", "project", "wireframe", "prototype", "research"],
   "Career Switcher": ["transferable", "project", "portfolio", "learning", "collaborated", "research"],
 };
