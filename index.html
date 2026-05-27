@@ -6,7 +6,7 @@
     <title>FixSend by Yabato Co.</title>
     <meta
       name="description"
-      content="FixSend helps job seekers decide if they should send, fix, or skip before applying."
+      content="FixSend scores your CV before you apply and unlocks a private Fix Pack dashboard with priority fixes, scorecards, and rewrite guidance."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -35,15 +35,15 @@
     <main id="top">
       <section class="hero section">
         <div class="hero-content">
-          <p class="eyebrow">Pre-apply decision engine</p>
+          <p class="eyebrow">CV score + private Fix Pack dashboard</p>
           <h1>Know if you should send, fix, or skip before applying.</h1>
           <p class="hero-copy">
-            Upload your CV and get an instant Send, Fix, or Skip signal with a score,
-            strengths, gaps, and quick fixes. No signup required.
+            Upload your CV, get a free readiness score, then unlock a private dashboard
+            with UX scorecards, recruiter scan, priority fixes, and rewrite guidance.
           </p>
           <div class="hero-actions">
             <a class="button primary" href="#try-it">Check for free</a>
-            <span class="privacy-note">Your CV stays in your browser.</span>
+            <span class="privacy-note">Free analysis runs locally in your browser.</span>
           </div>
           <div class="hero-package">
             <strong>Fix Pack unlocks:</strong>
@@ -53,18 +53,38 @@
             <span>Before-applying checklist</span>
           </div>
         </div>
-        <div class="decision-preview" aria-label="FixSend decision preview">
-          <div class="preview-topline">
-            <span>Decision</span>
-            <strong>8.4 / 10</strong>
+        <div class="hero-dashboard-preview" aria-label="Fix Pack dashboard preview">
+          <div class="mock-window">
+            <div class="mock-topbar">
+              <span></span>
+              <span></span>
+              <span></span>
+              <strong>Fix Pack Dashboard</strong>
+            </div>
+            <div class="mock-hero">
+              <div>
+                <small>FixSend score</small>
+                <strong>7.2 / 10</strong>
+              </div>
+              <span class="mock-badge fix">Fix</span>
+            </div>
+            <div class="mock-rings">
+              <div class="mock-ring" style="--score: 82"><span>82%</span><small>Portfolio</small></div>
+              <div class="mock-ring" style="--score: 64"><span>64%</span><small>UX process</small></div>
+              <div class="mock-ring" style="--score: 58"><span>58%</span><small>Impact</small></div>
+            </div>
+            <div class="mock-panel">
+              <h3>Priority fixes</h3>
+              <p>Add clearer portfolio proof near the top.</p>
+              <p>Rewrite two bullets with measurable outcomes.</p>
+              <p>Add missing role keywords naturally.</p>
+            </div>
+            <div class="mock-actions">
+              <span>Recruiter scan</span>
+              <span>Rewrite templates</span>
+              <span>Checklist</span>
+            </div>
           </div>
-          <div class="preview-decision send">Send</div>
-          <div class="preview-bars">
-            <span style="--bar-width: 86%"></span>
-            <span style="--bar-width: 74%"></span>
-            <span style="--bar-width: 92%"></span>
-          </div>
-          <p>Strong portfolio, relevant tools, and clear product design keywords.</p>
         </div>
       </section>
 
@@ -97,7 +117,8 @@
           <p class="eyebrow">Try FixSend</p>
           <h2>Check your application fit.</h2>
           <p>
-            Your CV is analyzed locally in your browser. We do not store your CV.
+            Free analysis runs locally in your browser. If you choose Fix Pack,
+            FixSend creates a private checkout session so your dashboard can be generated.
           </p>
         </div>
 
@@ -118,10 +139,23 @@
             </div>
             <small class="field-help" id="cvFileHelp">No file selected yet.</small>
             <textarea
+              class="cv-text-source"
               id="cvText"
-              rows="12"
-              placeholder="CV preview appears here after upload. You can also paste your CV text manually."
+              aria-hidden="true"
+              tabindex="-1"
+              hidden
             ></textarea>
+            <div class="upload-status" id="uploadStatus" hidden>
+              <div>
+                <span class="file-state">Uploaded</span>
+                <strong id="uploadedFileName">CV file</strong>
+                <small id="uploadedFileMeta">Ready to analyze.</small>
+              </div>
+              <div class="upload-actions">
+                <button class="text-button" type="button" id="changeFileButton">Change</button>
+                <button class="text-button danger" type="button" id="removeFileButton">Remove</button>
+              </div>
+            </div>
           </div>
 
           <label class="field">
@@ -136,11 +170,6 @@
               <option value="junior-designer">Junior Designer</option>
               <option value="career-switcher">Career Switcher</option>
             </select>
-          </label>
-
-          <label class="field">
-            <span>Email <em>optional</em></span>
-            <input id="emailInput" type="email" placeholder="you@example.com" />
           </label>
 
           <div class="form-actions">
@@ -193,7 +222,7 @@
                 wording, bullet rewrite guidance, missing keywords, and before-applying
                 checklist.
               </p>
-              <small>After purchase, submit your CV details and receive a private link by email.</small>
+              <small>After purchase, your private dashboard link is sent to your Gumroad checkout email.</small>
             </div>
             <a
               class="button primary checkout-button"
@@ -211,9 +240,9 @@
           <p class="eyebrow">Fix Pack</p>
           <h2>Your private CV improvement dashboard.</h2>
           <p>
-            After purchase, you will receive a private Fix Pack dashboard with your CV
+            After purchase, you receive a private Fix Pack dashboard with your CV
             diagnosis, priority fixes, rewrite guidance, missing keywords, and next-step
-            recommendation.
+            recommendation by email.
           </p>
           <ul class="package-list">
             <li>Portfolio signal and recruiter scan</li>
@@ -221,9 +250,8 @@
             <li>Profile summary direction and bullet rewrite templates</li>
             <li>Before-applying checklist with next steps</li>
           </ul>
-          <small class="premium-note">Early version: private dashboard link delivered by email after review.</small>
+          <small class="premium-note">Private dashboard link is delivered automatically by email after purchase.</small>
         </div>
-        <!-- Gumroad overlay checkout. After purchase, Gumroad receipt sends customers to https://tally.so/r/44p06b. -->
         <a
           class="button secondary"
           href="#try-it"
@@ -248,7 +276,10 @@
           </details>
           <details>
             <summary>Is my CV stored?</summary>
-            <p>No. In this MVP, your CV is analyzed locally in your browser.</p>
+            <p>
+              Free analysis runs locally in your browser. If you choose Fix Pack,
+              your CV is used to create a private paid dashboard and email you the link.
+            </p>
           </details>
           <details>
             <summary>Is it only for designers?</summary>
@@ -264,7 +295,7 @@
 
     <footer class="site-footer">
       <span>FixSend by Yabato Co.</span>
-      <span>Built as a zero-cost static MVP.</span>
+      <span>Browser-first CV scoring with automated Fix Pack delivery.</span>
     </footer>
 
     <script src="https://gumroad.com/js/gumroad.js"></script>

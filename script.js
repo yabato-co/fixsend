@@ -181,6 +181,11 @@ const uploadBox = document.querySelector("#uploadBox");
 const cvFile = document.querySelector("#cvFile");
 const cvFileHelp = document.querySelector("#cvFileHelp");
 const cvText = document.querySelector("#cvText");
+const uploadStatus = document.querySelector("#uploadStatus");
+const uploadedFileName = document.querySelector("#uploadedFileName");
+const uploadedFileMeta = document.querySelector("#uploadedFileMeta");
+const changeFileButton = document.querySelector("#changeFileButton");
+const removeFileButton = document.querySelector("#removeFileButton");
 const targetRole = document.querySelector("#targetRole");
 const formMessage = document.querySelector("#formMessage");
 const loadingState = document.querySelector("#loadingState");
@@ -190,6 +195,8 @@ const browserSupabase = window.supabase?.createClient(
   FIXSEND_SUPABASE_URL,
   FIXSEND_SUPABASE_ANON_KEY
 );
+let lastAnalysisData = null;
+let checkoutSessionId = "";
 
 const roleLabels = {
   "ux-designer": "UX Designer",
@@ -386,7 +393,7 @@ function renderResults(data) {
 function setCheckoutSession(sessionId) {
   const checkoutUrl = sessionId
     ? `${gumroadBaseUrl}&session_id=${encodeURIComponent(sessionId)}`
-    : gumroadBaseUrl;
+    : "#";
 
   document.querySelectorAll(".checkout-button").forEach((button) => {
     button.href = checkoutUrl;
@@ -418,6 +425,24 @@ async function createPendingSession(data) {
 function setFileHelp(message, isError = false) {
   cvFileHelp.textContent = message;
   cvFileHelp.classList.toggle("error-text", isError);
+}
+
+function resetCvUpload() {
+  cvFile.value = "";
+  cvText.value = "";
+  uploadStatus.hidden = true;
+  uploadBox.hidden = false;
+  lastAnalysisData = null;
+  checkoutSessionId = "";
+  setCheckoutSession("");
+  setFileHelp("No file selected yet.");
+}
+
+function showUploadedFile(file, text) {
+  uploadedFileName.textContent = file.name;
+  uploadedFileMeta.textContent = `${Math.max(1, Math.round(text.trim().split(/\s+/).length))} words found. Ready to analyze.`;
+  uploadStatus.hidden = false;
+  uploadBox.hidden = true;
 }
 
 async function readPdfFile(file) {
@@ -482,10 +507,13 @@ async function handleCvFile(file) {
     }
 
     cvText.value = text.trim();
-    setFileHelp(`Loaded "${file.name}". Your CV is not uploaded or stored.`);
+    showUploadedFile(file, text);
+    setFileHelp("CV uploaded successfully. It is only sent if you choose Fix Pack checkout.");
   } catch (error) {
     cvText.value = "";
-    setFileHelp(`${error.message} You can still paste your CV text into the box below.`, true);
+    uploadStatus.hidden = true;
+    uploadBox.hidden = false;
+    setFileHelp(`${error.message} Try another PDF, DOCX, or TXT file.`, true);
   }
 }
 
@@ -511,10 +539,18 @@ uploadBox.addEventListener("drop", async (event) => {
   await handleCvFile(event.dataTransfer.files[0]);
 });
 
+changeFileButton.addEventListener("click", () => {
+  cvFile.click();
+});
+
+removeFileButton.addEventListener("click", () => {
+  resetCvUpload();
+});
+
 function validateInputs(cv) {
-  if (!cv.trim()) return "Please upload your CV or paste your CV text first.";
+  if (!cv.trim()) return "Please upload your CV first.";
   if (cv.trim().split(/\s+/).length < 35) {
-    return "This CV looks very short. Upload the full CV or paste more detail so FixSend can score it properly.";
+    return "This CV looks very short. Upload the full CV so FixSend can score it properly.";
   }
   return "";
 }
@@ -544,9 +580,10 @@ form.addEventListener("submit", (event) => {
         createdAt: new Date().toISOString(),
       })
     );
-    const sessionId = await createPendingSession(data);
-    localStorage.setItem("fixsendLastSessionId", sessionId || "");
-    setCheckoutSession(sessionId);
+    lastAnalysisData = data;
+    checkoutSessionId = "";
+    localStorage.setItem("fixsendLastSessionId", "");
+    setCheckoutSession("");
     renderResults(data);
     loadingState.hidden = true;
     results.hidden = false;
@@ -555,10 +592,39 @@ form.addEventListener("submit", (event) => {
 });
 
 document.querySelectorAll(".checkout-button").forEach((button) => {
-  button.addEventListener("click", (event) => {
-    if (button.getAttribute("href") === "#") {
+  button.addEventListener("click", async (event) => {
+    if (!lastAnalysisData) {
       event.preventDefault();
       formMessage.textContent = "Run the CV analysis first so FixSend can create your private checkout session.";
+      return;
+    }
+
+    if (!checkoutSessionId) {
+      event.preventDefault();
+      const originalText = button.textContent;
+      button.textContent = "Preparing checkout...";
+      button.setAttribute("aria-busy", "true");
+      formMessage.textContent = "";
+
+      const sessionId = await createPendingSession(lastAnalysisData);
+      button.textContent = originalText;
+      button.removeAttribute("aria-busy");
+
+      if (!sessionId) {
+        formMessage.textContent = "Checkout session could not be created. Please try again in a moment.";
+        return;
+      }
+
+      checkoutSessionId = sessionId;
+      localStorage.setItem("fixsendLastSessionId", sessionId);
+      setCheckoutSession(sessionId);
+
+      if (window.GumroadOverlay) {
+        window.GumroadOverlay.open(button.href);
+        return;
+      }
+
+      window.location.href = button.href;
       return;
     }
 
