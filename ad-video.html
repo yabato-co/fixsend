@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FixSend Promo Video Scene</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="fixsend-logo.svg" type="image/svg+xml" />
+    <style>
+      :root {
+        --primary: #2444e5;
+        --ink: #111827;
+        --muted: #667085;
+        --soft: #f4f7ff;
+        --line: #dfe6ff;
+        --send: #0f9f6e;
+        --fix: #d98211;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        background: #f8faff;
+        color: var(--ink);
+        font-family: "Inter", Arial, sans-serif;
+      }
+
+      .stage {
+        position: relative;
+        width: min(100vw, 56.25vh);
+        aspect-ratio: 9 / 16;
+        overflow: hidden;
+        background:
+          linear-gradient(120deg, rgba(36, 68, 229, 0.16), rgba(97, 200, 255, 0.1), rgba(255, 255, 255, 0), rgba(15, 159, 110, 0.08)),
+          linear-gradient(180deg, #fbfcff 0%, #ffffff 44%, #f2f6ff 100%);
+      }
+
+      .stage::before {
+        content: "";
+        position: absolute;
+        inset: -30%;
+        background:
+          radial-gradient(circle at 15% 22%, rgba(36, 68, 229, 0.22), transparent 27%),
+          radial-gradient(circle at 80% 12%, rgba(97, 200, 255, 0.16), transparent 26%),
+          radial-gradient(circle at 78% 82%, rgba(15, 159, 110, 0.13), transparent 28%);
+        filter: blur(18px);
+        opacity: 0.76;
+        animation: drift 9s ease-in-out infinite alternate;
+      }
+
+      .site {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        grid-template-rows: auto 1fr;
+        gap: 14px;
+        align-items: stretch;
+        padding: 10.8% 6% 34%;
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(223, 230, 255, 0.9);
+        border-radius: 0;
+        box-shadow: 0 38px 90px rgba(20, 31, 72, 0.16);
+        backdrop-filter: blur(18px);
+        animation: siteIn 900ms ease both;
+      }
+
+      .copy {
+        display: grid;
+        align-content: start;
+        padding-top: 0;
+      }
+
+      .eyebrow,
+      .card-label {
+        color: var(--primary);
+        font-size: 14px;
+        font-weight: 900;
+        letter-spacing: 0;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 8px 0 10px;
+        font-size: clamp(34px, 8vw, 52px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+
+      .lead {
+        max-width: 620px;
+        margin: 0;
+        color: var(--muted);
+        font-size: clamp(14px, 3vw, 17px);
+        line-height: 1.35;
+        font-weight: 600;
+      }
+
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+        margin-top: 14px;
+      }
+
+      .cta {
+        display: inline-flex;
+        min-height: 52px;
+        align-items: center;
+        justify-content: center;
+        padding: 0 20px;
+        color: #ffffff;
+        background: var(--primary);
+        border-radius: 999px;
+        box-shadow: 0 20px 38px rgba(36, 68, 229, 0.28);
+        font-size: 15px;
+        font-weight: 900;
+      }
+
+      .pill {
+        min-height: 42px;
+        padding: 11px 14px;
+        color: #0f6d4f;
+        background: #eaf8f2;
+        border: 1px solid #ccefe0;
+        border-radius: 999px;
+        font-weight: 900;
+      }
+
+      .price {
+        position: absolute;
+        left: 50%;
+        top: 48.4%;
+        display: grid;
+        width: min(78%, 360px);
+        gap: 6px;
+        padding: 14px 18px;
+        background: linear-gradient(135deg, #0f9f6e 0%, #2444e5 100%);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.48);
+        border-radius: 18px;
+        box-shadow: 0 22px 42px rgba(36, 68, 229, 0.22);
+        animation: pricePop 900ms ease both 4.8s;
+        opacity: 0;
+        text-align: center;
+      }
+
+      .price span {
+        color: #dfffea;
+        font-size: 13px;
+        font-weight: 900;
+        text-transform: uppercase;
+      }
+
+      .price strong {
+        color: #ffffff;
+        font-size: 28px;
+        line-height: 1;
+      }
+
+      .price em {
+        color: rgba(255, 255, 255, 0.86);
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 900;
+      }
+
+      .browser {
+        position: relative;
+        min-height: 0;
+        height: 76%;
+        margin-top: 0;
+        overflow: hidden;
+        background: #ffffff;
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        box-shadow: 0 28px 68px rgba(22, 33, 74, 0.16);
+        animation: dashboardIn 900ms ease both 650ms;
+        opacity: 0;
+      }
+
+      .browser-top {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 36px;
+        padding: 0 14px;
+        background: #121521;
+        color: #ffffff;
+        font-weight: 800;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #ff6b6b;
+      }
+
+      .dot:nth-child(2) {
+        background: #f2b84b;
+      }
+
+      .dot:nth-child(3) {
+        background: #2dcf8f;
+        margin-right: 8px;
+      }
+
+      .screen {
+        display: grid;
+        gap: 8px;
+        padding: 10px;
+      }
+
+      .upload-card,
+      .result-card,
+      .fixpack-card {
+        padding: 10px;
+        background: var(--soft);
+        border: 1px solid #e8edff;
+        border-radius: 22px;
+      }
+
+      .upload-card {
+        display: grid;
+        gap: 10px;
+        animation: cardStep 7s ease-in-out infinite;
+      }
+
+      .drop {
+        display: grid;
+        min-height: 46px;
+        place-items: center;
+        border: 2px dashed rgba(36, 68, 229, 0.28);
+        border-radius: 18px;
+        color: var(--primary);
+        font-weight: 900;
+      }
+
+      .select-line {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 9px 10px;
+        background: #ffffff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        color: var(--muted);
+        font-weight: 800;
+        font-size: 13px;
+      }
+
+      .role-word::after {
+        content: "UX Designer";
+        animation: roleSwap 7s steps(1, end) infinite;
+      }
+
+      .result-card {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 16px;
+        animation: resultRise 7s ease-in-out infinite;
+      }
+
+      .score {
+        font-size: 24px;
+        font-weight: 900;
+      }
+
+      .decision {
+        display: inline-flex;
+        min-width: 78px;
+        justify-content: center;
+        padding: 9px 13px;
+        color: #ffffff;
+        background: var(--fix);
+        border-radius: 999px;
+        font-size: 20px;
+        font-weight: 900;
+      }
+
+      .fixpack-card {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #eef3ff 0%, #ffffff 72%);
+        animation: fixpackGlow 7s ease-in-out infinite;
+      }
+
+      .ring-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        margin: 8px 0;
+      }
+
+      .ring {
+        display: grid;
+        justify-items: center;
+        gap: 8px;
+        padding: 8px 5px;
+        background: #ffffff;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        text-align: center;
+      }
+
+      .ring::before {
+        content: "";
+        width: 48px;
+        height: 48px;
+        background:
+          radial-gradient(circle closest-side, #ffffff 68%, transparent 70%),
+          conic-gradient(var(--primary) calc(var(--fill, 0) * 1%), #e5ebff 0);
+        border-radius: 999px;
+        animation: fillRing 7s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+      }
+
+      .ring strong {
+        margin-top: -39px;
+        color: var(--primary);
+        font-size: 13px;
+      }
+
+      .ring small {
+        color: var(--muted);
+        font-weight: 900;
+      }
+
+      .fixes {
+        display: grid;
+        gap: 6px;
+      }
+
+      .fixes p {
+        margin: 0;
+        padding: 7px 8px;
+        background: #ffffff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        color: #344061;
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .tagline {
+        display: inline-flex;
+        width: fit-content;
+        margin-top: 8px;
+        padding: 8px 10px;
+        background: #eef3ff;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--primary);
+        font-size: 12px;
+        font-weight: 900;
+        animation: fadeLoop 7s ease-in-out infinite;
+      }
+
+      @property --fill {
+        syntax: "<number>";
+        inherits: true;
+        initial-value: 0;
+      }
+
+      @keyframes drift {
+        from {
+          transform: translate3d(-1.4%, -1%, 0) scale(1);
+        }
+
+        to {
+          transform: translate3d(1.5%, 1%, 0) scale(1.04);
+        }
+      }
+
+      @keyframes siteIn {
+        from {
+          opacity: 0;
+          transform: translateY(28px) scale(0.98);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @keyframes dashboardIn {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        from {
+          opacity: 0;
+          transform: translateY(24px);
+        }
+      }
+
+      @keyframes pricePop {
+        to {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0) scale(1);
+        }
+
+        from {
+          opacity: 0;
+          transform: translateX(-50%) translateY(18px) scale(0.96);
+        }
+      }
+
+      @keyframes roleSwap {
+        0%,
+        34% {
+          content: "UX Designer";
+        }
+
+        35%,
+        67% {
+          content: "Brand Designer";
+        }
+
+        68%,
+        100% {
+          content: "Frontend Developer";
+        }
+      }
+
+      @keyframes cardStep {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+
+        45% {
+          transform: translateY(-4px);
+        }
+      }
+
+      @keyframes resultRise {
+        0%,
+        24% {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+
+        34%,
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fixpackGlow {
+        0%,
+        48% {
+          box-shadow: none;
+        }
+
+        58%,
+        100% {
+          box-shadow: 0 18px 38px rgba(36, 68, 229, 0.16);
+        }
+      }
+
+      @keyframes fillRing {
+        0%,
+        48% {
+          --fill: 0;
+        }
+
+        64%,
+        100% {
+          --fill: var(--score);
+        }
+      }
+
+      @keyframes fadeLoop {
+        0%,
+        56% {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+
+        68%,
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="stage" aria-label="FixSend promotional video scene">
+      <section class="site">
+        <div class="copy">
+          <div class="eyebrow">Free CV analysis</div>
+          <h1>Evaluate your CV before you apply.</h1>
+          <p class="lead">
+            For design, product, and creative tech roles. Want a deeper report?
+            Unlock Fix Pack for only $2.99.
+          </p>
+          <div class="cta-row">
+            <span class="cta">Check your CV for free</span>
+            <span class="pill">English CV recommended</span>
+          </div>
+        </div>
+
+        <aside class="browser">
+          <div class="browser-top">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            FixSend website
+          </div>
+          <div class="screen">
+            <section class="upload-card">
+              <span class="card-label">Step 1</span>
+              <div class="drop">Upload your English CV</div>
+              <div class="select-line">
+                <span>Target role</span>
+                <strong class="role-word"></strong>
+              </div>
+            </section>
+
+            <section class="result-card">
+              <div>
+                <span class="card-label">Free result</span>
+                <div class="score">7.2 / 10</div>
+                <div class="tagline">Send / Fix / Skip</div>
+              </div>
+              <span class="decision">Fix</span>
+            </section>
+
+            <section class="fixpack-card">
+              <span class="card-label">Fix Pack Dashboard</span>
+              <div class="ring-row">
+                <div class="ring" style="--score: 82"><strong>82%</strong><small>Portfolio</small></div>
+                <div class="ring" style="--score: 64"><strong>64%</strong><small>Process</small></div>
+                <div class="ring" style="--score: 58"><strong>58%</strong><small>Impact</small></div>
+              </div>
+              <div class="fixes">
+                <p>Recruiter scan and role scorecards</p>
+                <p>Priority fixes and missing keywords</p>
+                <p>Rewrite guidance before applying</p>
+              </div>
+            </section>
+          </div>
+        </aside>
+
+        <div class="price">
+          <span>Deeper report</span>
+          <strong>Only $2.99</strong>
+          <em>One tiny price, full Fix Pack dashboard</em>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
