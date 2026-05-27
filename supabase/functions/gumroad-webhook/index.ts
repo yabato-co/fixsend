@@ -197,6 +197,72 @@ function createDashboard(input: FixPackInput) {
   };
 }
 
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+async function sendDashboardEmail(input: {
+  to: string;
+  dashboardUrl: string;
+  decision: string;
+  score: number;
+  targetRole: string;
+}) {
+  const resendApiKey = Deno.env.get("RESEND_API_KEY");
+  const fromEmail = Deno.env.get("FIXSEND_FROM_EMAIL") || "FixSend <onboarding@resend.dev>";
+
+  if (!resendApiKey || !input.to) {
+    return {
+      sent: false,
+      error: !resendApiKey ? "Missing RESEND_API_KEY" : "Missing customer email",
+    };
+  }
+
+  const safeDashboardUrl = escapeHtml(input.dashboardUrl);
+  const safeTargetRole = escapeHtml(input.targetRole);
+
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${resendApiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: fromEmail,
+      to: input.to,
+      subject: "Your FixSend Fix Pack dashboard is ready",
+      html: `
+        <div style="font-family: Inter, Arial, sans-serif; color: #111827; line-height: 1.55; max-width: 620px; margin: 0 auto; padding: 28px;">
+          <p style="font-size: 14px; color: #2444E5; font-weight: 700; margin: 0 0 12px;">FixSend by Yabato Co.</p>
+          <h1 style="font-size: 26px; line-height: 1.2; margin: 0 0 14px;">Your Fix Pack dashboard is ready.</h1>
+          <p style="font-size: 16px; margin: 0 0 18px;">We analyzed your CV for <strong>${safeTargetRole}</strong> and prepared your detailed dashboard.</p>
+          <div style="background: #F6F8FF; border: 1px solid #DDE5FF; border-radius: 14px; padding: 18px; margin: 20px 0;">
+            <p style="margin: 0 0 6px;"><strong>Decision:</strong> ${escapeHtml(input.decision)}</p>
+            <p style="margin: 0;"><strong>Score:</strong> ${input.score}/10</p>
+          </div>
+          <a href="${safeDashboardUrl}" style="display: inline-block; background: #2444E5; color: #ffffff; text-decoration: none; font-weight: 700; border-radius: 10px; padding: 13px 18px;">Open my dashboard</a>
+          <p style="font-size: 14px; color: #4B5563; margin: 22px 0 0;">If the button does not work, copy this link into your browser:</p>
+          <p style="font-size: 14px; word-break: break-all; margin: 6px 0 0;"><a href="${safeDashboardUrl}" style="color: #2444E5;">${safeDashboardUrl}</a></p>
+        </div>
+      `,
+      text: `Your FixSend Fix Pack dashboard is ready.\n\nDecision: ${input.decision}\nScore: ${input.score}/10\nTarget role: ${input.targetRole}\n\nOpen your dashboard:\n${input.dashboardUrl}`,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    return { sent: false, error: errorText };
+  }
+
+  const result = await response.json();
+  return { sent: true, id: result.id || null };
+}
+
 Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
 
@@ -296,6 +362,8 @@ Deno.serve(async (req) => {
       ok: true,
       report_id: session.report_id,
       dashboard_url: `${dashboardBaseUrl}?id=${session.report_id}`,
+      email_sent: false,
+      email_note: "Report already existed, email not resent.",
     });
   }
 
@@ -327,6 +395,15 @@ Deno.serve(async (req) => {
     return Response.json({ ok: false, error: reportError?.message || "Report create failed" }, { status: 500 });
   }
 
+  const dashboardUrl = `${dashboardBaseUrl}?id=${report.id}`;
+  const emailResult = await sendDashboardEmail({
+    to: email,
+    dashboardUrl,
+    decision: dashboard.decision,
+    score: dashboard.overallScore,
+    targetRole: session.target_role,
+  });
+
   await supabase
     .from("fixpack_sessions")
     .update({
@@ -340,6 +417,8 @@ Deno.serve(async (req) => {
   return Response.json({
     ok: true,
     report_id: report.id,
-    dashboard_url: `${dashboardBaseUrl}?id=${report.id}`,
+    dashboard_url: dashboardUrl,
+    email_sent: emailResult.sent,
+    email_result: emailResult,
   });
 });
