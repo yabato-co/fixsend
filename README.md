@@ -54,7 +54,7 @@ The current post-purchase Tally request form is:
 
 `https://tally.so/r/44p06b`
 
-In `index.html`, find the comment near the **Get Fix Pack - $9** button:
+In `index.html`, find the **Get Fix Pack - $2.99** button:
 
 ```html
 <!-- Gumroad overlay checkout. After purchase, Gumroad receipt sends customers to https://tally.so/r/44p06b. -->
@@ -86,6 +86,6 @@ The current paid dashboard flow no longer requires `submit.html`. Supabase files
 
 ## Where payment or AI can be added later
 
-- Payment currently uses Gumroad through the **Get Fix Pack - $9** links in `index.html`.
+- Payment currently uses Gumroad through the **Get Fix Pack - $2.99** links in `index.html`.
 - AI-powered reports can be added later by replacing or extending the rule-based logic in `script.js`.
 - For the MVP, everything runs locally in the browser and no CV text is stored.
