@@ -288,10 +288,57 @@ const roleLabels = {
   "career-switcher": "Career Switcher",
 };
 
+function setupScrollReveals() {
+  const revealItems = [...document.querySelectorAll(".reveal-item")];
+
+  document.querySelectorAll(".reveal-group").forEach((group) => {
+    [...group.querySelectorAll(".reveal-item")].forEach((item, index) => {
+      item.style.setProperty("--reveal-index", index);
+    });
+  });
+
+  const revealVisibleItems = () => {
+    const triggerLine = window.innerHeight * 0.9;
+    revealItems.forEach((item) => {
+      if (item.classList.contains("is-visible")) return;
+      const rect = item.getBoundingClientRect();
+      if (rect.top < triggerLine && rect.bottom > 0) {
+        item.classList.add("is-visible");
+      }
+    });
+  };
+
+  if (!("IntersectionObserver" in window)) {
+    revealVisibleItems();
+    window.addEventListener("scroll", revealVisibleItems, { passive: true });
+    window.addEventListener("resize", revealVisibleItems);
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.16, rootMargin: "0px 0px -8% 0px" }
+  );
+
+  revealItems.forEach((item) => observer.observe(item));
+  revealVisibleItems();
+  window.addEventListener("scroll", revealVisibleItems, { passive: true });
+  window.addEventListener("resize", revealVisibleItems);
+}
+
 if (window.pdfjsLib) {
   window.pdfjsLib.GlobalWorkerOptions.workerSrc =
     "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 }
+
+setupScrollReveals();
 
 function normalize(text) {
   const cleaned = text

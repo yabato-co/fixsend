@@ -139,8 +139,9 @@ a {
 
 .dashboard-brand img {
   display: block;
-  width: 100%;
-  height: 100%;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
 }
 
 .dashboard-topbar p,
