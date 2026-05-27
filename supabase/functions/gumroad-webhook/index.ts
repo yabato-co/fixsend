@@ -263,6 +263,67 @@ async function sendDashboardEmail(input: {
   return { sent: true, id: result.id || null };
 }
 
+function parseNestedField(rawValue: unknown) {
+  if (!rawValue) return {};
+  if (typeof rawValue === "object") return rawValue as Record<string, unknown>;
+
+  const raw = String(rawValue).trim();
+  if (!raw) return {};
+
+  try {
+    return JSON.parse(raw) as Record<string, unknown>;
+  } catch {
+    // Gumroad Ping documents url_params as a dictionary-like string, not always strict JSON.
+  }
+
+  try {
+    const decoded = decodeURIComponent(raw);
+    const params = new URLSearchParams(decoded);
+    const entries = Object.fromEntries(params.entries());
+    if (Object.keys(entries).length) return entries;
+  } catch {
+    // Keep going and use the regex fallback below.
+  }
+
+  const result: Record<string, string> = {};
+  const pairs = [...raw.matchAll(/['"]?([A-Za-z0-9_-]+)['"]?\s*(?::|=>|=)\s*['"]?([^,'"}&\s]+)['"]?/g)];
+  pairs.forEach((match) => {
+    result[match[1]] = match[2];
+  });
+
+  return result;
+}
+
+function getField(fields: Record<string, FormDataEntryValue | string>, key: string) {
+  const value = fields[key];
+  return value ? String(value).trim() : "";
+}
+
+function extractSessionId(fields: Record<string, FormDataEntryValue | string>) {
+  const direct = getField(fields, "session_id") || getField(fields, "sessionId");
+  if (direct) return direct;
+
+  const nestedSources = [
+    parseNestedField(fields.url_params),
+    parseNestedField(fields.custom_fields),
+  ];
+
+  for (const source of nestedSources) {
+    const value =
+      source.session_id ||
+      source.sessionId ||
+      source.SessionId ||
+      source["Session ID"] ||
+      source["session id"];
+
+    if (value) return String(value).trim();
+  }
+
+  const rawSearchArea = `${fields.url_params || ""} ${fields.custom_fields || ""}`;
+  const regexMatch = rawSearchArea.match(/session[_\s-]?id['"]?\s*(?::|=>|=)\s*['"]?([A-Za-z0-9-]+)/i);
+  return regexMatch?.[1] || "";
+}
+
 Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
 
@@ -306,28 +367,56 @@ Deno.serve(async (req) => {
     }
   }
 
-  const saleId = String(allFields.sale_id || allFields.id || "");
-  const email = String(allFields.email || "");
-  const permalink = String(allFields.permalink || allFields.product_permalink || "");
-  const urlParamsRaw = String(allFields.url_params || "");
-  let sessionId = String(allFields.session_id || "").trim();
+  const saleId = getField(allFields, "sale_id") || getField(allFields, "id");
+  const email = getField(allFields, "email");
+  const permalink = getField(allFields, "permalink") || getField(allFields, "product_permalink");
+  let sessionId = extractSessionId(allFields);
 
   if (permalink && permalink !== expectedProductPermalink) {
     return Response.json({ ok: false, error: "Wrong product" }, { status: 400 });
   }
 
-  if (!sessionId && urlParamsRaw) {
-    try {
-      const parsed = JSON.parse(urlParamsRaw);
-      sessionId = String(parsed.session_id || parsed.sessionId || "");
-    } catch {
-      const params = new URLSearchParams(urlParamsRaw);
-      sessionId = params.get("session_id") || "";
-    }
-  }
-
   if (!sessionId) {
-    return Response.json({ ok: false, error: "Missing session_id", received: allFields }, { status: 400 });
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const { data: fallbackSession, error: fallbackError } = await supabase
+      .from("fixpack_sessions")
+      .select("id,status,target_role,created_at")
+      .eq("status", "pending")
+      .gte("created_at", oneHourAgo)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (fallbackSession?.id) {
+      sessionId = fallbackSession.id;
+      console.info("FixSend fallback matched Gumroad sale to recent pending session", {
+        sale_id: saleId,
+        email,
+        session_id: sessionId,
+        session_created_at: fallbackSession.created_at,
+      });
+    } else {
+      console.warn("FixSend Gumroad webhook missing session_id", {
+        sale_id: saleId,
+        email,
+        product_permalink: permalink,
+        url_params: allFields.url_params || null,
+        custom_fields: allFields.custom_fields || null,
+        fallback_error: fallbackError?.message || null,
+      });
+
+      return Response.json(
+        {
+          ok: false,
+          error: "Missing session_id",
+          received_keys: Object.keys(allFields),
+          url_params: allFields.url_params || null,
+          custom_fields: allFields.custom_fields || null,
+          fallback_error: fallbackError?.message || null,
+        },
+        { status: 400 },
+      );
+    }
   }
 
   const { data: session, error: sessionError } = await supabase
