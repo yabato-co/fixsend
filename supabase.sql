@@ -28,6 +28,13 @@ create table if not exists public.fixpack_sessions (
 alter table public.fixpack_reports enable row level security;
 alter table public.fixpack_sessions enable row level security;
 
+grant usage on schema public to anon;
+grant select, insert on public.fixpack_reports to anon;
+grant select, insert on public.fixpack_sessions to anon;
+grant usage on schema public to service_role;
+grant select, insert, update on public.fixpack_reports to service_role;
+grant select, insert, update on public.fixpack_sessions to service_role;
+
 drop policy if exists "Allow public read by id" on public.fixpack_reports;
 create policy "Allow public read by id"
 on public.fixpack_reports
